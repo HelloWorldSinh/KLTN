@@ -11,6 +11,7 @@ import { UserProfilePage } from './pages/UserProfilePage';
 import { PatientBooking } from './pages/PatientBooking';
 import { MyAppointments } from './pages/MyAppointments';
 import { DoctorAppointments } from './pages/DoctorAppointments';
+import { DoctorSchedule } from './pages/DoctorSchedule';
 import { ExaminationPage } from './pages/ExaminationPage';
 import { useAuthStore } from './store/authStore';
 import { Toaster } from 'react-hot-toast';
@@ -61,7 +62,7 @@ const App = () => {
             <Route path="/doctor" element={<ProtectedRoute allowedRoles={['DOCTOR']} />}>
               <Route path="patients" element={<DoctorAppointments />} />
               <Route path="examination/:appointmentId" element={<ExaminationPage />} />
-              <Route path="schedule" element={<MockPage title="Lịch làm việc cá nhân" />} />
+              <Route path="schedule" element={<DoctorSchedule />} />
               <Route path="diagnosis" element={<MockPage title="Chẩn đoán & Đơn thuốc" />} />
             </Route>
 

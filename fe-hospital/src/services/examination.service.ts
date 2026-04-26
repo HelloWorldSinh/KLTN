@@ -6,6 +6,7 @@ export interface ExaminationResponse {
   diagnosis: string | null;
   status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
   prescriptionDetails: PrescriptionDetailResponse[];
+  lastUpdated: string | null;
 }
 
 export interface PrescriptionDetailResponse {

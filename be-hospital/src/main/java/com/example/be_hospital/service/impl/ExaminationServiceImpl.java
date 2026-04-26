@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,6 +49,7 @@ public class ExaminationServiceImpl implements ExaminationService {
             response.setDiagnosis(exam.getDiagnosis());
 
             prescriptionRepository.findById(appointmentId).ifPresent(pres -> {
+                response.setLastUpdated(pres.getLastUpdated());
                 List<ExaminationResponse.PrescriptionDetailResponse> details = prescriptionDetailRepository
                         .findByPrescriptionId(appointmentId).stream().map(d -> {
                             ExaminationResponse.PrescriptionDetailResponse dr = new ExaminationResponse.PrescriptionDetailResponse();
@@ -93,10 +96,6 @@ public class ExaminationServiceImpl implements ExaminationService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-        if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            return new ResponseObject(false, "Hồ sơ đã đóng, không thể chỉnh sửa");
-        }
-
         Examination examination = examinationRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Vui lòng lưu thông tin chẩn đoán trước khi kê đơn"));
 
@@ -106,6 +105,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 
         // Save Prescription master
         Prescription prescription = prescriptionRepository.findById(appointmentId).orElse(new Prescription());
+
         prescription.setExaminationId(appointmentId);
         prescriptionRepository.save(prescription);
 

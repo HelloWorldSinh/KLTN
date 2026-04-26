@@ -19,12 +19,12 @@ export const Login = () => {
 
     try {
       await login({ phone: phoneNumber, password });
-      
+
       const user = useAuthStore.getState().user;
 
       switch (user?.role) {
         case 'ADMIN': navigate('/admin/dashboard'); break;
-        case 'DOCTOR': navigate('/doctor/schedule'); break;
+        case 'DOCTOR': navigate('/doctor/patients'); break;
         case 'STAFF': navigate('/staff/appointments'); break;
         default: navigate('/patient/dashboard'); break;
       }
@@ -79,9 +79,8 @@ export const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-primary text-white py-2 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
-              loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-dark'
-            }`}
+            className={`w-full bg-primary text-white py-2 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-dark'
+              }`}
           >
             {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </button>
