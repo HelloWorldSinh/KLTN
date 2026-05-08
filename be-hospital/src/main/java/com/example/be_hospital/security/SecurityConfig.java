@@ -24,14 +24,15 @@ import java.util.Arrays;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    
+
     @Value("${app.cors.allowed-origins}")
     private List<String> allowedOrigins;
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "/login",
             "/register",
-            "/home"
+            "/home",
+            "/api/chat"
     };
 
     @Bean
@@ -50,19 +51,20 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
+
         // Sử dụng cấu hình từ application.properties
-        configuration.setAllowedOrigins(allowedOrigins); 
-        
+        configuration.setAllowedOrigins(allowedOrigins);
+
         // Cho phép các phương thức phổ biến
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        
+
         // Cho phép các header quan trọng cho JWT và Request
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
-        
+        configuration.setAllowedHeaders(
+                Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
+
         // Cho phép gửi credentials (Token/Cookie)
         configuration.setAllowCredentials(true);
-        
+
         // Cache kết quả pre-flight request trong 1 giờ
         configuration.setMaxAge(3600L);
 

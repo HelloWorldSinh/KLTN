@@ -90,6 +90,24 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- ===== LangChain4j - Chatbot AI ===== -->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-spring-boot4-starter</artifactId>
+			<version>1.13.1-beta23</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-google-ai-gemini-spring-boot4-starter</artifactId>
+			<version>1.13.1-beta23</version>
+		</dependency>
+		<!-- Embedding model chạy local, không cần API key -->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>
+			<version>1.13.1-beta23</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -17,6 +17,7 @@ import {
 import { examinationService, type ExaminationResponse, type PrescriptionDetailResponse } from '../services/examination.service';
 import { medicineService, type MedicineDTO } from '../services/medicine.service';
 import toast from 'react-hot-toast';
+import { formatDateTime } from '../utils/format';
 
 export const ExaminationPage = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();
@@ -380,7 +381,7 @@ export const ExaminationPage = () => {
                     Đơn thuốc cập nhật lần cuối lúc:
                   </h4>
                   <div className="inline-block bg-primary/5 text-primary px-4 py-2 rounded-xl text-sm font-bold border border-primary/10">
-                    {examData.lastUpdated}
+                    {formatDateTime(examData.lastUpdated)}
                   </div>
                 </div>
               )}
