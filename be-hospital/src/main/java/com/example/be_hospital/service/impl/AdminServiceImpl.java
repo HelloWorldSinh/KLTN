@@ -3,15 +3,18 @@ package com.example.be_hospital.service.impl;
 import com.example.be_hospital.dto.account.AccountRequest;
 import com.example.be_hospital.dto.account.AccountResponse;
 import com.example.be_hospital.dto.ResponseObject;
-import com.example.be_hospital.entity.User;
-import com.example.be_hospital.repository.DoctorProfileRepository;
-import com.example.be_hospital.repository.UserRepository;
+import com.example.be_hospital.dto.admin.DashboardStatsResponse;
+import com.example.be_hospital.dto.admin.RecentAppointmentDTO;
+import com.example.be_hospital.entity.*;
+import com.example.be_hospital.repository.*;
 import com.example.be_hospital.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +25,18 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private DoctorProfileRepository doctorProfileRepository;
+
+    @Autowired
+    private SpecialtyRepository specialtyRepository;
+
+    @Autowired
+    private MedicineRepository medicineRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
     @Override
     public List<AccountResponse> getAllAccounts() {
@@ -117,5 +132,74 @@ public class AdminServiceImpl implements AdminService {
         }
         userRepository.deleteById(id);
         return new ResponseObject(true, "Xóa thành công");
+    }
+
+    @Override
+    public DashboardStatsResponse getDashboardStats() {
+        DashboardStatsResponse stats = new DashboardStatsResponse();
+        
+        // Count totals
+        stats.setTotalPatients(userRepository.countByRole("PATIENT"));
+        stats.setTotalDoctors(userRepository.countByRole("DOCTOR"));
+        stats.setTotalStaff(userRepository.countByRole("STAFF"));
+        stats.setTotalSpecialties(specialtyRepository.count());
+        stats.setTotalMedicines(medicineRepository.count());
+        stats.setTotalAppointments(appointmentRepository.count());
+        stats.setPendingCancelSchedules(scheduleRepository.countByStatus("PENDING_CANCEL"));
+
+        // Status breakdown
+        Map<String, Long> statusCounts = new HashMap<>();
+        // Initialize all enum values to 0 to ensure we have consistent keys in the response
+        for (AppointmentStatus status : AppointmentStatus.values()) {
+            statusCounts.put(status.name(), 0L);
+        }
+        
+        List<Object[]> statusGroupResults = appointmentRepository.countAppointmentsByStatus();
+        for (Object[] row : statusGroupResults) {
+            if (row[0] != null) {
+                AppointmentStatus status = (AppointmentStatus) row[0];
+                Long count = (Long) row[1];
+                statusCounts.put(status.name(), count);
+            }
+        }
+        stats.setStatusCounts(statusCounts);
+
+        // Recent appointments
+        List<Appointment> recentList = appointmentRepository.findTop10ByOrderByCreatedAtDesc();
+        List<RecentAppointmentDTO> recentDTOs = recentList.stream().map(appointment -> {
+            RecentAppointmentDTO dto = new RecentAppointmentDTO();
+            dto.setId(appointment.getId());
+            dto.setStatus(appointment.getStatus());
+            dto.setCreatedAt(appointment.getCreatedAt());
+
+            // Patient info
+            userRepository.findById(appointment.getPatientId()).ifPresent(patient -> {
+                dto.setPatientName(patient.getFullName());
+                dto.setPatientPhone(patient.getPhone());
+            });
+
+            // Schedule info
+            scheduleRepository.findById(appointment.getScheduleId()).ifPresent(schedule -> {
+                dto.setWorkDate(schedule.getWorkDate());
+                dto.setTimeSlot(schedule.getStartTime().toString() + " - " + schedule.getEndTime().toString());
+
+                // Doctor info
+                userRepository.findById(schedule.getDoctorId()).ifPresent(doctor -> {
+                    dto.setDoctorName(doctor.getFullName());
+                });
+
+                // Specialty info
+                doctorProfileRepository.findById(schedule.getDoctorId()).ifPresent(profile -> {
+                    specialtyRepository.findById(profile.getSpecialtyId()).ifPresent(specialty -> {
+                        dto.setSpecialtyName(specialty.getName());
+                    });
+                });
+            });
+
+            return dto;
+        }).collect(Collectors.toList());
+
+        stats.setRecentAppointments(recentDTOs);
+        return stats;
     }
 }

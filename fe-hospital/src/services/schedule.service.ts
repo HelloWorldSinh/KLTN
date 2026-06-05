@@ -10,6 +10,8 @@ export interface ScheduleDTO {
   slot: number;
   room: string;
   appointmentCount?: number;
+  status?: string;
+  cancelReason?: string;
 }
 
 export interface ScheduleCreateRequest {
@@ -58,6 +60,21 @@ export const scheduleService = {
 
   getSchedulesByDoctor: async (doctorId: number) => {
     const response = await api.get<ScheduleDTO[]>(`/schedules/doctor/${doctorId}`);
+    return response.data;
+  },
+
+  requestCancelSchedule: async (id: number, reason: string) => {
+    const response = await api.post<ResponseObject>(`/schedules/${id}/cancel-request`, { reason });
+    return response.data;
+  },
+
+  approveCancelSchedule: async (id: number) => {
+    const response = await api.post<ResponseObject>(`/schedules/${id}/approve-cancel`);
+    return response.data;
+  },
+
+  rejectCancelSchedule: async (id: number, reason: string) => {
+    const response = await api.post<ResponseObject>(`/schedules/${id}/reject-cancel`, { reason });
     return response.data;
   }
 };

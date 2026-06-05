@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { examinationService, type ExaminationResponse, type PrescriptionDetailResponse } from '../services/examination.service';
 import { medicineService, type MedicineDTO } from '../services/medicine.service';
+import { queueService } from '../services/queue.service';
 import toast from 'react-hot-toast';
 import { formatDateTime } from '../utils/format';
 
@@ -39,6 +40,18 @@ export const ExaminationPage = () => {
 
   const id = parseInt(appointmentId || '0');
   const isReadOnly = examData?.status === 'COMPLETED';
+
+  const handleBack = async () => {
+    // Nếu đang khám dở và nhấn quay lại, hoàn lại trạng thái chờ khám (WAITING)
+    if (examData?.status === 'IN_PROGRESS') {
+      try {
+        await queueService.revertExamination(id);
+      } catch (err) {
+        console.error('Lỗi khi hoàn lại trạng thái', err);
+      }
+    }
+    navigate('/doctor/patients');
+  };
 
   useEffect(() => {
     fetchData();
@@ -141,6 +154,7 @@ export const ExaminationPage = () => {
     setSelectedPrescription([...selectedPrescription, {
       medicineId: med.id!,
       medicineName: med.name,
+      medicineUnit: med.unit,
       quantity: 1,
       dosage: ''
     }]);
@@ -174,7 +188,7 @@ export const ExaminationPage = () => {
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => navigate('/doctor/patients')}
+          onClick={handleBack}
           className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors font-bold group"
         >
           <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
@@ -305,7 +319,10 @@ export const ExaminationPage = () => {
                           onClick={() => addMedicine(m)}
                           className="p-4 hover:bg-gray-50 cursor-pointer flex items-center justify-between group"
                         >
-                          <span className="font-bold text-gray-700">{m.name}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-gray-700">{m.name}</span>
+                            <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-lg">{m.unit}</span>
+                          </div>
                           <Plus className="w-4 h-4 text-gray-300 group-hover:text-primary transition-colors" />
                         </div>
                       ))}
@@ -323,7 +340,10 @@ export const ExaminationPage = () => {
                   {selectedPrescription.map((item, idx) => (
                     <div key={item.medicineId} className="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100 group">
                       <div className="flex-1">
-                        <p className="font-bold text-gray-800">{idx + 1}. {item.medicineName}</p>
+                        <p className="font-bold text-gray-800">
+                          {idx + 1}. {item.medicineName}
+                          {item.medicineUnit && <span className="ml-2 text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-lg">{item.medicineUnit}</span>}
+                        </p>
                       </div>
                       <div className="flex flex-wrap items-center gap-3">
                         <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-200">

@@ -35,4 +35,10 @@ public class Schedule {
 
     private int slot;
     private String room;
+
+    @Column(name = "status", nullable = false)
+    private String status = "ACTIVE";
+
+    @Column(name = "cancel_reason")
+    private String cancelReason;
 }

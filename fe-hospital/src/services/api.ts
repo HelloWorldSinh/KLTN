@@ -26,4 +26,19 @@ api.interceptors.request.use(
   }
 );
 
+// Interceptor to handle response errors, specifically 401 Unauthorized
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Dispatch a global custom event to trigger logout and redirect.
+      // This design avoids circular dependencies between api service and authStore.
+      window.dispatchEvent(new Event('unauthorized-api-call'));
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

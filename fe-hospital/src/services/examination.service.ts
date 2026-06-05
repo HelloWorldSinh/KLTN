@@ -4,7 +4,7 @@ export interface ExaminationResponse {
   appointmentId: number;
   symptom: string | null;
   diagnosis: string | null;
-  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+  status: 'PENDING' | 'CONFIRMED' | 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'NO_SHOW' | 'CANCELLED';
   prescriptionDetails: PrescriptionDetailResponse[];
   lastUpdated: string | null;
 }
@@ -12,6 +12,7 @@ export interface ExaminationResponse {
 export interface PrescriptionDetailResponse {
   medicineId: number;
   medicineName: string;
+  medicineUnit: string;
   quantity: number;
   dosage: string;
 }

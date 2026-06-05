@@ -19,4 +19,10 @@ public interface ScheduleService {
     List<ScheduleDTO> getSchedulesByDoctor(int doctorId);
 
     List<ScheduleDTO> getAvailableSchedules(Integer specialtyId, Integer doctorId, LocalDate date);
+
+    ResponseObject requestCancelSchedule(int id, String reason);
+
+    ResponseObject approveCancelSchedule(int id);
+
+    ResponseObject rejectCancelSchedule(int id, String reason);
 }

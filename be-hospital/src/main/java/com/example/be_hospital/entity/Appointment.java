@@ -32,9 +32,15 @@ public class Appointment {
     private AppointmentStatus status;
 
     @Column(name = "cancel_reason")
-    private  String cancelReason;
+    private String cancelReason;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "queue_order")
+    private Integer queueOrder;
+
+    @Column(name = "absent_at")
+    private LocalDateTime absentAt;
 }

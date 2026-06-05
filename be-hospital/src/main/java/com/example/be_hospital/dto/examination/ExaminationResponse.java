@@ -19,6 +19,7 @@ public class ExaminationResponse {
     public static class PrescriptionDetailResponse {
         private int medicineId;
         private String medicineName;
+        private String medicineUnit;
         private int quantity;
         private String dosage;
     }

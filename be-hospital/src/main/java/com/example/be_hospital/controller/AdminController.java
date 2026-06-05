@@ -3,6 +3,7 @@ package com.example.be_hospital.controller;
 import com.example.be_hospital.dto.account.AccountRequest;
 import com.example.be_hospital.dto.account.AccountResponse;
 import com.example.be_hospital.dto.ResponseObject;
+import com.example.be_hospital.dto.admin.DashboardStatsResponse;
 import com.example.be_hospital.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,11 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @GetMapping("/dashboard-stats")
+    public ResponseEntity<DashboardStatsResponse> getDashboardStats() {
+        return ResponseEntity.ok(adminService.getDashboardStats());
+    }
 
     @GetMapping("/accounts")
     public ResponseEntity<List<AccountResponse>> getAllAccounts() {

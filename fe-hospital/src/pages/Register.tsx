@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Activity } from 'lucide-react';
 import { authService, type SignupRequest } from '../services/auth.service';
+import { Header } from '../components/Header';
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -61,13 +62,17 @@ export const Register = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-secondary items-center justify-center p-4 py-12">
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-xl w-full">
-        <div className="flex flex-col items-center mb-6">
-          <Activity className="h-10 w-10 text-primary mb-2" />
-          <h2 className="text-xl font-bold text-gray-800">Tạo tài khoản Bệnh nhân</h2>
-          <p className="text-sm text-gray-500">Tham gia MediCare để bắt đầu quản lý sức khỏe của bạn</p>
-        </div>
+    <div className="min-h-screen bg-secondary flex flex-col font-sans">
+      <Header />
+      <div className="flex-1 flex items-center justify-center p-4 py-12">
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-xl w-full">
+          <div className="flex flex-col items-center mb-6">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 mb-3 animate-pulse">
+              <Activity className="h-6 w-6" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-800">Tạo tài khoản Bệnh nhân</h2>
+            <p className="text-sm text-gray-500 mt-1">Tham gia MediCare để bắt đầu quản lý sức khỏe của bạn</p>
+          </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
           {error && (
@@ -209,5 +214,6 @@ export const Register = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };

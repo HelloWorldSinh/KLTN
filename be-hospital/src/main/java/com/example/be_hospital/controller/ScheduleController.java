@@ -68,4 +68,50 @@ public class ScheduleController {
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(scheduleService.getAvailableSchedules(specialtyId, doctorId, date));
     }
+
+    @PostMapping("/{id}/cancel-request")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<ResponseObject> requestCancelSchedule(
+            @PathVariable int id,
+            @RequestBody CancelRequest request) {
+        ResponseObject response = scheduleService.requestCancelSchedule(id, request.getReason());
+        if (response.isStatus()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @PostMapping("/{id}/approve-cancel")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> approveCancelSchedule(@PathVariable int id) {
+        ResponseObject response = scheduleService.approveCancelSchedule(id);
+        if (response.isStatus()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @PostMapping("/{id}/reject-cancel")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseObject> rejectCancelSchedule(
+            @PathVariable int id,
+            @RequestBody CancelRequest request) {
+        ResponseObject response = scheduleService.rejectCancelSchedule(id, request.getReason());
+        if (response.isStatus()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    public static class CancelRequest {
+        private String reason;
+
+        public String getReason() {
+            return reason;
+        }
+
+        public void setReason(String reason) {
+            this.reason = reason;
+        }
+    }
 }

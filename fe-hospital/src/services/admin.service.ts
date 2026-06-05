@@ -20,6 +20,30 @@ export interface AccountRequest {
   startWorkingDate?: string;
 }
 
+export interface RecentAppointmentDTO {
+  id: number;
+  patientName: string;
+  patientPhone: string;
+  doctorName: string;
+  specialtyName: string;
+  workDate: string;
+  timeSlot: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface DashboardStatsResponse {
+  totalPatients: number;
+  totalDoctors: number;
+  totalStaff: number;
+  totalSpecialties: number;
+  totalMedicines: number;
+  totalAppointments: number;
+  pendingCancelSchedules: number;
+  statusCounts: Record<string, number>;
+  recentAppointments: RecentAppointmentDTO[];
+}
+
 export const adminService = {
   getAllAccounts: async () => {
     const response = await api.get<AccountResponse[]>('/admin/accounts');
@@ -38,6 +62,11 @@ export const adminService = {
 
   deleteAccount: async (id: number) => {
     const response = await api.delete(`/admin/delete/${id}`);
+    return response.data;
+  },
+
+  getDashboardStats: async () => {
+    const response = await api.get<DashboardStatsResponse>('/admin/dashboard-stats');
     return response.data;
   }
 };

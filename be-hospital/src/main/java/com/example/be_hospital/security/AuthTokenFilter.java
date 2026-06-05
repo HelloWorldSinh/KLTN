@@ -57,7 +57,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // Hàm hỗ trợ: Trích xuất đoạn mã JWT từ Header của request
+    // Hàm hỗ trợ: Trích xuất đoạn mã JWT từ Header hoặc Query Parameter của request
     private String parseJwt(HttpServletRequest request) {
         // Thông thường React sẽ gửi token trong header có tên là "Authorization"
         String headerAuth = request.getHeader("Authorization");
@@ -65,6 +65,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         // Chuẩn JWT quy định token sẽ bắt đầu bằng chữ "Bearer "
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7); // Cắt bỏ 7 ký tự "Bearer " để lấy lõi token
+        }
+
+        // Cũng cho phép lấy token từ query parameter (hỗ trợ cho kết nối SSE/EventSource)
+        String tokenParam = request.getParameter("token");
+        if (StringUtils.hasText(tokenParam)) {
+            return tokenParam;
         }
 
         return null;

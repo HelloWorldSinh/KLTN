@@ -1,0 +1,770 @@
+================================================================================
+                       DANH SÁCH TEST CASE KIỂM THỬ HỆ THỐNG MEDICARE
+================================================================================
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_01
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đăng ký tài khoản
+- Mục đích test (Test Objective): Tạo tài khoản bệnh nhân mới thành công
+- Điều kiện test (Test precondition): Số điện thoại chưa được đăng ký trước đó
+- Các bước test (Test procedure):
+  1. Truy cập trang Đăng ký.
+  2. Nhập đầy đủ thông tin hợp lệ.
+  3. Nhấn nút "Đăng ký".
+- Dữ liệu test (Test data):
+  + Họ tên: Nguyễn Văn An
+  + SĐT: 0901234567
+  + Mật khẩu: 123456
+  + Email: an.nguyen@example.com
+  + Ngày sinh: 15/08/1995
+  + Giới tính: Nam
+  + Địa chỉ: Hà Nội
+- Kết quả mong đợi (Expected result): Đăng ký thành công, hệ thống thông báo tạo tài khoản thành công và tự động chuyển hướng về trang Đăng nhập.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_02
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đăng ký tài khoản
+- Mục đích test (Test Objective): Hệ thống báo lỗi trùng số điện thoại
+- Điều kiện test (Test precondition): Số điện thoại đã được tài khoản khác sử dụng
+- Các bước test (Test procedure):
+  1. Truy cập trang Đăng ký.
+  2. Nhập thông tin với số điện thoại đã tồn tại.
+  3. Nhấn nút "Đăng ký".
+- Dữ liệu test (Test data):
+  + SĐT trùng: 0901234567
+- Kết quả mong đợi (Expected result): Hệ thống báo lỗi "Lỗi: Số điện thoại đã tồn tại" và không cho đăng ký.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_03
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đăng ký tài khoản
+- Mục đích test (Test Objective): Hệ thống báo lỗi khi thiếu thông tin bắt buộc
+- Điều kiện test (Test precondition): Nhập thiếu trường bắt buộc (ví dụ: Họ tên hoặc Mật khẩu)
+- Các bước test (Test procedure):
+  1. Truy cập trang Đăng ký.
+  2. Để trống trường "Họ tên".
+  3. Nhập các trường còn lại và nhấn "Đăng ký".
+- Dữ liệu test (Test data):
+  + Họ tên: (để trống)
+- Kết quả mong đợi (Expected result): HTML5 validation báo lỗi trường bắt buộc, nút đăng ký không thực hiện submit.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_04
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đăng nhập
+- Mục đích test (Test Objective): Đăng nhập thành công với vai trò Bệnh nhân
+- Điều kiện test (Test precondition): Tài khoản bệnh nhân đã tồn tại hợp lệ
+- Các bước test (Test procedure):
+  1. Truy cập trang Đăng nhập.
+  2. Nhập số điện thoại và mật khẩu bệnh nhân.
+  3. Nhấp "Đăng nhập".
+- Dữ liệu test (Test data):
+  + SĐT: 0901234567
+  + Mật khẩu: 123456
+- Kết quả mong đợi (Expected result): Đăng nhập thành công, điều hướng về trang Tổng quan bệnh nhân (/patient/dashboard).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_05
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đăng nhập
+- Mục đích test (Test Objective): Đăng nhập thành công với vai trò Bác sĩ
+- Điều kiện test (Test precondition): Tài khoản bác sĩ đã được Admin tạo trên hệ thống
+- Các bước test (Test procedure):
+  1. Truy cập trang Đăng nhập.
+  2. Nhập số điện thoại và mật khẩu bác sĩ.
+  3. Nhấp "Đăng nhập".
+- Dữ liệu test (Test data):
+  + SĐT: 0908888888
+  + Mật khẩu: 123456
+- Kết quả mong đợi (Expected result): Đăng nhập thành công, điều hướng về trang Lịch khám bệnh nhân của bác sĩ (/doctor/patients).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_06
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đăng nhập
+- Mục đích test (Test Objective): Đăng nhập thành công với vai trò Nhân viên
+- Điều kiện test (Test precondition): Tài khoản nhân viên đã được Admin tạo trên hệ thống
+- Các bước test (Test procedure):
+  1. Truy cập trang Đăng nhập.
+  2. Nhập số điện thoại và mật khẩu nhân viên.
+  3. Nhấp "Đăng nhập".
+- Dữ liệu test (Test data):
+  + SĐT: 0905555555
+  + Mật khẩu: 123456
+- Kết quả mong đợi (Expected result): Đăng nhập thành công, điều hướng về trang Lịch hẹn của nhân viên (/staff/appointments).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_07
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đăng nhập
+- Mục đích test (Test Objective): Đăng nhập thành công với vai trò Admin
+- Điều kiện test (Test precondition): Tài khoản admin đã tồn tại
+- Các bước test (Test procedure):
+  1. Truy cập trang Đăng nhập.
+  2. Nhập tài khoản admin.
+  3. Nhấp "Đăng nhập".
+- Dữ liệu test (Test data):
+  + SĐT: 0909999999
+  + Mật khẩu: admin123
+- Kết quả mong đợi (Expected result): Đăng nhập thành công, điều hướng về trang Bảng thống kê Admin (/admin/dashboard).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_08
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đăng nhập
+- Mục đích test (Test Objective): Hệ thống báo lỗi khi sai thông tin đăng nhập
+- Điều kiện test (Test precondition): Nhập sai số điện thoại hoặc mật khẩu
+- Các bước test (Test procedure):
+  1. Nhập số điện thoại chưa đăng ký hoặc mật khẩu sai.
+  2. Nhấp "Đăng nhập".
+- Dữ liệu test (Test data):
+  + SĐT: 0999999999
+  + Mật khẩu: sai_pass
+- Kết quả mong đợi (Expected result): Hệ thống hiển thị thông báo lỗi "Tài khoản hoặc mật khẩu không chính xác" và giữ nguyên trang đăng nhập.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_09
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Tổng quan bệnh nhân
+- Mục đích test (Test Objective): Hiển thị đầy đủ thông tin trang Dashboard bệnh nhân
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Bệnh nhân
+- Các bước test (Test procedure):
+  1. Xem nội dung trang Dashboard.
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hiển thị lời chào đúng tên bệnh nhân, lịch hẹn sắp tới gần nhất và bảng lịch sử các ca khám bệnh gần đây.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_10
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đặt lịch khám
+- Mục đích test (Test Objective): Tìm kiếm bác sĩ thành công
+- Điều kiện test (Test precondition): Đang ở trang đặt lịch khám (Bước 1)
+- Các bước test (Test procedure):
+  1. Nhập tên bác sĩ cần tìm vào ô tìm kiếm.
+- Dữ liệu test (Test data):
+  + Từ khóa: Huy
+- Kết quả mong đợi (Expected result): Danh sách hiển thị đúng các bác sĩ có tên chứa từ khóa "Huy".
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_11
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đặt lịch khám
+- Mục đích test (Test Objective): Lọc danh sách bác sĩ theo chuyên khoa
+- Điều kiện test (Test precondition): Đang ở trang đặt lịch khám (Bước 1)
+- Các bước test (Test procedure):
+  1. Click chọn một chuyên khoa trên thanh lọc chuyên khoa.
+- Dữ liệu test (Test data):
+  + Chuyên khoa: Nhi khoa
+- Kết quả mong đợi (Expected result): Chỉ hiển thị các bác sĩ thuộc chuyên khoa "Nhi khoa".
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_12
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đặt lịch khám
+- Mục đích test (Test Objective): Xem thông tin chi tiết bác sĩ
+- Điều kiện test (Test precondition): Đang ở trang đặt lịch khám (Bước 1)
+- Các bước test (Test procedure):
+  1. Nhấn nút "Chi tiết" trên thẻ bác sĩ.
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hiển thị Modal thông tin chi tiết của bác sĩ (Học vị, chuyên khoa, ngày bắt đầu làm việc, mô tả).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_13
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đặt lịch khám
+- Mục đích test (Test Objective): Chọn ngày trực và ca trực còn chỗ trống thành công
+- Điều kiện test (Test precondition): Đã chọn bác sĩ, đang ở Bước 2
+- Các bước test (Test procedure):
+  1. Nhấn chọn ngày làm việc (tô xanh đậm) trên lưới lịch tháng.
+  2. Chọn ca trực Sáng hoặc Chiều còn trống (màu xanh nhạt).
+  3. Nhấn "Tiếp tục".
+- Dữ liệu test (Test data):
+  + Ca trực: Ca Sáng
+- Kết quả mong đợi (Expected result): Hệ thống lưu thông tin và chuyển sang Bước 3 (Xác nhận thông tin).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_14
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đặt lịch khám
+- Mục đích test (Test Objective): Không cho chọn ca trực đã hết chỗ
+- Điều kiện test (Test precondition): Đang ở Bước 2; Bác sĩ có ca trực nhưng đã đủ số lượng đăng ký
+- Các bước test (Test procedure):
+  1. Xem ca trực đã hết chỗ trên màn hình.
+- Dữ liệu test (Test data):
+  + Ca trực: Ca Chiều (đã đầy, nút màu xám)
+- Kết quả mong đợi (Expected result): Nút ca trực hiển thị màu xám, bị khóa click (không thể nhấn chọn).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_15
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đặt lịch khám
+- Mục đích test (Test Objective): Xác nhận thông tin và hoàn tất đặt lịch
+- Điều kiện test (Test precondition): Đã thực hiện đầy đủ Bước 1 và Bước 2
+- Các bước test (Test procedure):
+  1. Tại Bước 3 (Xác nhận thông tin), kiểm tra thông tin tóm tắt đặt lịch.
+  2. Nhấn nút "Xác nhận đặt lịch".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Chuyển sang Bước 4 (Thành công), hiển thị thông tin đặt khám thành công kèm Số thứ tự khám (Queue Order).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_16
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Lịch hẹn của tôi
+- Mục đích test (Test Objective): Xem danh sách các lịch hẹn
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Bệnh nhân
+- Các bước test (Test procedure):
+  1. Truy cập mục "Lịch của tôi".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hiển thị danh sách lịch hẹn phân loại theo bộ lọc: Sắp diễn ra, Hoàn thành, Đã hủy.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_17
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Lịch hẹn của tôi
+- Mục đích test (Test Objective): Hủy lịch hẹn khám thành công
+- Điều kiện test (Test precondition): Lịch hẹn khám ở trạng thái CONFIRMED hoặc PENDING
+- Các bước test (Test procedure):
+  1. Nhấn nút "Hủy lịch hẹn" ở lịch khám muốn hủy.
+  2. Chọn lý do hủy (hoặc nhập lý do khác).
+  3. Nhấn "Xác nhận".
+- Dữ liệu test (Test data):
+  + Lý do: Trùng lịch cá nhân
+- Kết quả mong đợi (Expected result): Lịch hẹn được cập nhật trạng thái thành CANCELLED, hiển thị lý do hủy tương ứng.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_18
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Hàng đợi khám
+- Mục đích test (Test Objective): Theo dõi thứ tự xếp hàng trực tuyến
+- Điều kiện test (Test precondition): Lịch hẹn của bệnh nhân trong ngày đang ở hàng đợi
+- Các bước test (Test procedure):
+  1. Truy cập mục "Hàng đợi khám".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hiển thị số thứ tự đang khám hiện tại của phòng trực và số thứ tự của bệnh nhân.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_19
+--------------------------------------------------------------------------------
+- Chức năng (Feature): AI Chatbot
+- Mục đích test (Test Objective): Bệnh nhân trò chuyện với trợ lý ảo AI
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Bệnh nhân
+- Các bước test (Test procedure):
+  1. Mở cửa sổ chatbot góc dưới phải.
+  2. Nhập câu hỏi và gửi.
+- Dữ liệu test (Test data):
+  + Câu hỏi: Phòng khám Nội khoa ở đâu?
+- Kết quả mong đợi (Expected result): Chatbot phản hồi thông tin tự động tương ứng theo nội dung câu hỏi.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_20
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Lịch làm việc của tôi
+- Mục đích test (Test Objective): Xem danh sách ca trực theo tháng
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Bác sĩ
+- Các bước test (Test procedure):
+  1. Truy cập mục "Lịch của tôi".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Lưới lịch hiển thị đúng các ca trực (khung giờ, phòng trực) của bác sĩ được xếp trong tháng.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_21
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Lịch làm việc của tôi
+- Mục đích test (Test Objective): Xem chi tiết ca trực và tỷ lệ lấp đầy
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Bác sĩ
+- Các bước test (Test procedure):
+  1. Nhấn vào một ngày có ca trực trên lưới lịch.
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hiển thị Modal chi tiết ca trực (Khung giờ, phòng trực, số lượng bệnh nhân thực tế đã đặt, progress bar tỷ lệ %).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_22
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Hủy ca trực bác sĩ
+- Mục đích test (Test Objective): Gửi yêu cầu hủy ca trực thành công khi thời gian hợp lệ
+- Điều kiện test (Test precondition): Ca trực trong tương lai cách ngày hiện tại từ 2 ngày trở lên
+- Các bước test (Test procedure):
+  1. Nhấn "Yêu cầu hủy ca trực" trong Modal chi tiết.
+  2. Nhập lý do hủy.
+  3. Nhấn "Xác nhận gửi".
+- Dữ liệu test (Test data):
+  + Ngày ca trực: Ngày T+3 (T là hôm nay)
+  + Lý do: Đi công tác đột xuất
+- Kết quả mong đợi (Expected result): Gửi thành công, ca trực trên lịch đổi sang trạng thái gạch ngang chữ kèm nhãn (Chờ hủy), tạo bản ghi ở tab "Yêu cầu hủy lịch".
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_23
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Hủy ca trực bác sĩ
+- Mục đích test (Test Objective): Hệ thống chặn không cho gửi yêu cầu khi khoảng cách < 2 ngày
+- Điều kiện test (Test precondition): Ca trực cách ngày hiện tại dưới 2 ngày
+- Các bước test (Test procedure):
+  1. Chọn ca trực ngày mai hoặc hôm nay.
+  2. Nhấn "Yêu cầu hủy ca trực", nhập lý do và gửi.
+- Dữ liệu test (Test data):
+  + Ngày ca trực: Ngày T+1 (Ngày mai)
+- Kết quả mong đợi (Expected result): Hệ thống chặn gửi, thông báo lỗi yêu cầu bác sĩ liên hệ trực tiếp Admin để hủy.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_24
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Theo dõi hủy lịch
+- Mục đích test (Test Objective): Xem danh sách yêu cầu hủy ca trực
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Bác sĩ
+- Các bước test (Test procedure):
+  1. Chuyển sang Tab "Yêu cầu hủy lịch".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Danh sách hiển thị đúng các yêu cầu hủy đã gửi kèm trạng thái tương ứng (Chờ duyệt, Đã hủy, Từ chối kèm lý do phản hồi).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_25
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Bệnh nhân của tôi
+- Mục đích test (Test Objective): Xem danh sách bệnh nhân khám trong ngày
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Bác sĩ
+- Các bước test (Test procedure):
+  1. Truy cập mục "Danh sách bệnh nhân".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hiển thị danh sách các bệnh nhân đã đặt lịch hẹn trong ngày trực của bác sĩ.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_26
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Hàng đợi khám bác sĩ
+- Mục đích test (Test Objective): Quản lý hàng đợi tại phòng khám
+- Điều kiện test (Test precondition): Đang trong ca trực của bác sĩ
+- Các bước test (Test procedure):
+  1. Truy cập mục "Hàng đợi khám".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hiển thị danh sách bệnh nhân đang chờ khám theo đúng số thứ tự tăng dần.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_27
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Khám bệnh
+- Mục đích test (Test Objective): Nhập thông tin triệu chứng và chẩn đoán
+- Điều kiện test (Test precondition): Bác sĩ đang thực hiện khám cho bệnh nhân
+- Các bước test (Test procedure):
+  1. Chọn bệnh nhân cần khám trong hàng đợi.
+  2. Nhập thông tin vào trường "Triệu chứng" và "Chẩn đoán".
+- Dữ liệu test (Test data):
+  + Triệu chứng: Ho sốt
+  + Chẩn đoán: Viêm họng
+- Kết quả mong đợi (Expected result): Các trường thông tin nhận dữ liệu nhập và hiển thị đúng ký tự.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_28
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Khám bệnh
+- Mục đích test (Test Objective): Tìm kiếm và kê đơn thuốc cho bệnh nhân
+- Điều kiện test (Test precondition): Bác sĩ thực hiện chỉ định thuốc
+- Các bước test (Test procedure):
+  1. Tại mục kê đơn, nhập tên thuốc vào ô tìm kiếm.
+  2. Chọn thuốc gợi ý.
+  3. Nhập số lượng và liều dùng, nhấn "Thêm thuốc".
+- Dữ liệu test (Test data):
+  + Thuốc: Amoxicillin 500mg
+  + Số lượng: 20
+  + Liều dùng: Ngày uống 2 viên
+- Kết quả mong đợi (Expected result): Thuốc được thêm vào danh sách kê đơn, hiển thị chính xác tên thuốc cùng đơn vị tính tự động (ví dụ: "viên").
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_29
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Khám bệnh
+- Mục đích test (Test Objective): Hoàn thành ca khám bệnh nhân
+- Điều kiện test (Test precondition): Đã nhập đầy đủ chẩn đoán và đơn thuốc
+- Các bước test (Test procedure):
+  1. Nhấn nút "Hoàn thành khám & Lưu đơn".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hệ thống lưu thông tin ca khám, cập nhật trạng thái lịch hẹn thành COMPLETED, giải phóng bệnh nhân khỏi hàng đợi.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_30
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Danh sách lịch hẹn
+- Mục đích test (Test Objective): Xem tất cả lịch hẹn khám của hệ thống
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Nhân viên
+- Các bước test (Test procedure):
+  1. Truy cập mục "Lịch hẹn".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hiển thị danh sách lịch hẹn khám của toàn bộ bệnh nhân trong hệ thống.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_31
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Tiếp đón & Xác nhận
+- Mục đích test (Test Objective): Xác nhận trạng thái bệnh nhân đến khám trực tiếp
+- Điều kiện test (Test precondition): Bệnh nhân đã đặt lịch đến phòng khám xếp hàng
+- Các bước test (Test procedure):
+  1. Tìm thông tin bệnh nhân qua SĐT.
+  2. Nhấn nút "Xác nhận có mặt" (hoặc tiếp nhận vào hàng đợi).
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Trạng thái bệnh nhân cập nhật thành WAITING (chờ khám), được đẩy vào hàng đợi của bác sĩ tương ứng.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_32
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Dashboard thống kê
+- Mục đích test (Test Objective): Xem báo cáo chỉ số và biểu đồ phân tích hoạt động
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Admin
+- Các bước test (Test procedure):
+  1. Truy cập trang "Dashboard".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Hiển thị đúng các thẻ chỉ số (bệnh nhân, bác sĩ, lượt khám...), biểu đồ phân tích trạng thái lịch hẹn và top 10 lịch hẹn mới nhất.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_33
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Dashboard thống kê
+- Mục đích test (Test Objective): Hiển thị cảnh báo yêu cầu hủy ca trực đang chờ duyệt
+- Điều kiện test (Test precondition): Hệ thống có yêu cầu hủy ca trực đang ở trạng thái PENDING_CANCEL
+- Các bước test (Test procedure):
+  1. Truy cập trang Dashboard.
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Xuất hiện banner cảnh báo màu hổ phách nhấp nháy hiển thị số lượng yêu cầu hủy đang chờ duyệt kèm nút "Duyệt ngay".
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_34
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý lịch trực
+- Mục đích test (Test Objective): Tạo lịch trực mới cho Bác sĩ (ca đơn lẻ)
+- Điều kiện test (Test precondition): Đang ở trang Quản lý lịch khám (/admin/schedules)
+- Các bước test (Test procedure):
+  1. Nhấn nút "Thêm lịch trực mới".
+  2. Chọn Bác sĩ, Ngày trực, Khung giờ, Phòng khám.
+  3. Nhấn "Lưu".
+- Dữ liệu test (Test data):
+  + Bác sĩ: Bùi Quang Huy
+  + Ngày trực: Ngày T+2
+  + Phòng: 102
+- Kết quả mong đợi (Expected result): Ca trực được tạo thành công và xuất hiện trên danh sách quản lý lịch trực.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_35
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý lịch trực
+- Mục đích test (Test Objective): Tạo lịch trực lặp lại theo thứ trong tuần
+- Điều kiện test (Test precondition): Đang ở trang Quản lý lịch khám
+- Các bước test (Test procedure):
+  1. Nhấn "Thêm lịch trực mới".
+  2. Chọn Bác sĩ, tick chọn "Lặp lại hàng tuần".
+  3. Chọn các thứ (Thứ 2, Thứ 4), Phòng, Khung giờ.
+  4. Chọn khoảng ngày áp dụng.
+  5. Nhấn "Lưu".
+- Dữ liệu test (Test data):
+  + Thứ áp dụng: Thứ 2, Thứ 4
+  + Phòng: 105
+- Kết quả mong đợi (Expected result): Hệ thống tự động tạo hàng loạt các ca trực vào đúng các ngày Thứ 2, Thứ 4 trong khoảng thời gian đã cấu hình.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_36
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý lịch trực
+- Mục đích test (Test Objective): Chỉnh sửa ca trực bác sĩ
+- Điều kiện test (Test precondition): Ca trực đã được xếp và chưa có bệnh nhân đăng ký đặt lịch
+- Các bước test (Test procedure):
+  1. Tìm ca trực, nhấn nút "Sửa".
+  2. Cập nhật phòng trực hoặc số slot tối đa.
+  3. Nhấn "Cập nhật".
+- Dữ liệu test (Test data):
+  + Phòng mới: 201
+- Kết quả mong đợi (Expected result): Ca trực cập nhật thành công thông tin phòng trực mới.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_37
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý lịch trực
+- Mục đích test (Test Objective): Xóa ca trực bác sĩ
+- Điều kiện test (Test precondition): Ca trực chưa có lịch hẹn đăng ký
+- Các bước test (Test procedure):
+  1. Tìm ca trực, nhấn nút "Xóa".
+  2. Xác nhận đồng ý xóa.
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Ca trực được xóa khỏi hệ thống, không còn hiển thị trên lịch.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_38
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Phê duyệt hủy lịch
+- Mục đích test (Test Objective): Admin phê duyệt yêu cầu hủy ca trực của bác sĩ thành công
+- Điều kiện test (Test precondition): Đang có yêu cầu hủy trạng thái PENDING_CANCEL
+- Các bước test (Test procedure):
+  1. Mở tab "Yêu cầu hủy lịch trực".
+  2. Nhấn nút "Phê duyệt" trên yêu cầu hủy.
+  3. Xác nhận đồng ý.
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Yêu cầu được duyệt. Ca trực đổi trạng thái sang CANCELLED. Toàn bộ lịch hẹn bệnh nhân trong ca trực đó chuyển sang SYSTEM_CANCELLED. Hệ thống tự động bắn thông báo cho bệnh nhân bị ảnh hưởng.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_39
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Phê duyệt hủy lịch
+- Mục đích test (Test Objective): Admin từ chối yêu cầu hủy ca trực của bác sĩ
+- Điều kiện test (Test precondition): Đang có yêu cầu hủy trạng thái PENDING_CANCEL
+- Các bước test (Test procedure):
+  1. Mở tab "Yêu cầu hủy lịch trực".
+  2. Nhấn nút "Từ chối" trên yêu cầu hủy.
+  3. Nhập lý do từ chối vào Modal và xác nhận.
+- Dữ liệu test (Test data):
+  + Lý do: Thiếu nhân lực trực thay thế
+- Kết quả mong đợi (Expected result): Từ chối thành công. Ca trực được khôi phục trạng thái hoạt động bình thường để bệnh nhân tiếp tục đăng ký. Phía bác sĩ nhận phản hồi lý do từ chối.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_40
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý người dùng
+- Mục đích test (Test Objective): Tìm kiếm và lọc danh sách tài khoản
+- Điều kiện test (Test precondition): Đang ở trang Quản lý người dùng (/admin/users)
+- Các bước test (Test procedure):
+  1. Nhập tên nhân viên vào ô tìm kiếm.
+  2. Chọn lọc theo vai trò (Bác sĩ hoặc Nhân viên).
+- Dữ liệu test (Test data):
+  + Tìm kiếm: Nguyễn
+  + Vai trò: Bác sĩ
+- Kết quả mong đợi (Expected result): Danh sách hiển thị đúng các tài khoản có tên chứa chữ "Nguyễn" và có vai trò là "Bác sĩ".
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_41
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý người dùng
+- Mục đích test (Test Objective): Tạo tài khoản nhân sự mới thành công
+- Điều kiện test (Test precondition): Đang ở trang Quản lý người dùng
+- Các bước test (Test procedure):
+  1. Nhấn nút "Thêm người dùng mới".
+  2. Nhập đầy đủ thông tin (Họ tên, SĐT, Mật khẩu, Chọn vai trò).
+  3. Nhấn "Tạo mới".
+- Dữ liệu test (Test data):
+  + Họ tên: Lê Văn Cường
+  + Vai trò: Nhân viên
+  + SĐT: 0987654321
+- Kết quả mong đợi (Expected result): Tạo tài khoản thành công. Tài khoản xuất hiện trong danh sách người dùng hệ thống.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_42
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý người dùng
+- Mục đích test (Test Objective): Chỉnh sửa thông tin tài khoản
+- Điều kiện test (Test precondition): Tài khoản người dùng đã tồn tại
+- Các bước test (Test procedure):
+  1. Chọn tài khoản, nhấn nút "Sửa" (hình bút chì).
+  2. Cập nhật thông tin (ví dụ: thêm Học vị đối với vai trò Bác sĩ).
+  3. Nhấn "Cập nhật".
+- Dữ liệu test (Test data):
+  + Học vị: Phó Giáo sư
+- Kết quả mong đợi (Expected result): Thông tin được cập nhật thành công trong cơ sở dữ liệu.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_43
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý người dùng
+- Mục đích test (Test Objective): Xóa tài khoản người dùng hệ thống
+- Điều kiện test (Test precondition): Tài khoản nhân sự đã tồn tại
+- Các bước test (Test procedure):
+  1. Tìm tài khoản cần xóa, nhấn nút "Xóa" (thùng rác).
+  2. Xác nhận đồng ý xóa.
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Tài khoản bị xóa khỏi hệ thống. Nếu là bác sĩ, thông tin profile bác sĩ tương ứng cũng tự động bị xóa sạch.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_44
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý chuyên khoa
+- Mục đích test (Test Objective): Thêm mới chuyên khoa của phòng khám
+- Điều kiện test (Test precondition): Đang ở trang Quản lý chuyên khoa (/admin/specialties)
+- Các bước test (Test procedure):
+  1. Nhấn "Thêm chuyên khoa mới".
+  2. Nhập tên và mô tả chuyên khoa.
+  3. Nhấn "Lưu".
+- Dữ liệu test (Test data):
+  + Tên chuyên khoa: Tim mạch
+  + Mô tả: Khám chữa tim mạch
+- Kết quả mong đợi (Expected result): Chuyên khoa mới được tạo thành công và xuất hiện trong danh sách chuyên khoa.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_45
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý chuyên khoa
+- Mục đích test (Test Objective): Chỉnh sửa thông tin chuyên khoa
+- Điều kiện test (Test precondition): Chuyên khoa đã có sẵn trên hệ thống
+- Các bước test (Test procedure):
+  1. Tìm chuyên khoa, nhấn nút "Sửa".
+  2. Thay đổi phần mô tả và nhấn "Cập nhật".
+- Dữ liệu test (Test data):
+  + Mô tả mới: Khám tim mạch cao cấp
+- Kết quả mong đợi (Expected result): Thông tin chuyên khoa cập nhật thành công.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_46
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý chuyên khoa
+- Mục đích test (Test Objective): Xóa chuyên khoa của phòng khám
+- Điều kiện test (Test precondition): Chuyên khoa đã có sẵn trên hệ thống
+- Các bước test (Test procedure):
+  1. Tìm chuyên khoa cần xóa, nhấn "Xóa".
+  2. Xác nhận đồng ý xóa.
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Chuyên khoa bị xóa khỏi danh sách hệ thống.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_47
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý kho thuốc
+- Mục đích test (Test Objective): Thêm biệt dược thuốc mới thành công
+- Điều kiện test (Test precondition): Đang ở trang Quản lý kho thuốc (/admin/medicines)
+- Các bước test (Test procedure):
+  1. Nhấn nút "Thêm thuốc mới".
+  2. Nhập tên thuốc, thành phần, đơn vị tính, cách dùng.
+  3. Nhấn "Lưu".
+- Dữ liệu test (Test data):
+  + Tên thuốc: Hapacol 250
+  + Đơn vị tính: gói
+- Kết quả mong đợi (Expected result): Thuốc mới được thêm thành công vào danh mục kho thuốc của phòng khám.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_48
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý kho thuốc
+- Mục đích test (Test Objective): Chỉnh sửa thông tin thuốc biệt dược
+- Điều kiện test (Test precondition): Thuốc đã có sẵn trong danh mục
+- Các bước test (Test procedure):
+  1. Tìm thuốc, nhấn nút "Sửa".
+  2. Thay đổi thông tin đơn vị tính hoặc tên thuốc.
+  3. Nhấn "Cập nhật".
+- Dữ liệu test (Test data):
+  + Đơn vị tính mới: chai
+- Kết quả mong đợi (Expected result): Thông tin thuốc cập nhật thành công.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_49
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Quản lý kho thuốc
+- Mục đích test (Test Objective): Xóa thuốc khỏi danh mục kho thuốc
+- Điều kiện test (Test precondition): Thuốc đã có sẵn trong danh mục
+- Các bước test (Test procedure):
+  1. Tìm thuốc, nhấn nút "Xóa".
+  2. Xác nhận đồng ý xóa.
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Thuốc được xóa khỏi danh mục kho thuốc của hệ thống.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_50
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Hồ sơ cá nhân
+- Mục đích test (Test Objective): Xem và cập nhật thông tin hồ sơ cá nhân
+- Điều kiện test (Test precondition): Người dùng bất kỳ đã đăng nhập vào hệ thống
+- Các bước test (Test procedure):
+  1. Truy cập trang "Quản lý hồ sơ".
+  2. Thay đổi trường email hoặc địa chỉ.
+  3. Nhấp "Lưu thay đổi".
+- Dữ liệu test (Test data):
+  + Email: user.new@example.com
+- Kết quả mong đợi (Expected result): Cập nhật thông tin cá nhân thành công, hệ thống tải lại thông tin mới.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_51
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đổi mật khẩu
+- Mục đích test (Test Objective): Thay đổi mật khẩu đăng nhập thành công
+- Điều kiện test (Test precondition): Người dùng bất kỳ đã đăng nhập vào hệ thống
+- Các bước test (Test procedure):
+  1. Truy cập trang "Đổi mật khẩu" (hoặc form đổi mật khẩu tại trang Profile).
+  2. Nhập mật khẩu hiện tại và mật khẩu mới hợp lệ.
+  3. Nhấn "Cập nhật mật khẩu".
+- Dữ liệu test (Test data):
+  + Mật khẩu cũ: 123456
+  + Mật khẩu mới: 654321
+- Kết quả mong đợi (Expected result): Hệ thống đổi mật khẩu thành công và thông báo cập nhật mật khẩu mới.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_52
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Đăng xuất
+- Mục đích test (Test Objective): Đăng xuất khỏi hệ thống thành công
+- Điều kiện test (Test precondition): Người dùng đã đăng nhập
+- Các bước test (Test procedure):
+  1. Nhấp chọn menu người dùng trên Header.
+  2. Chọn nút "Đăng xuất".
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Phiên làm việc bị xóa (clear auth state), điều hướng người dùng quay trở lại trang chủ (/).
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_53
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Ẩn chuông thông báo
+- Mục đích test (Test Objective): Không hiển thị chuông thông báo cho tài khoản Admin
+- Điều kiện test (Test precondition): Tài khoản đăng nhập có vai trò ADMIN
+- Các bước test (Test procedure):
+  1. Đăng nhập tài khoản Admin.
+  2. Quan sát thanh Header hệ thống (cả bản Desktop và Mobile).
+- Dữ liệu test (Test data): (Không có)
+- Kết quả mong đợi (Expected result): Biểu tượng quả chuông thông báo ẩn đi hoàn toàn trên Header; Các tài khoản vai trò khác vẫn hiển thị bình thường.
+- Kết quả (Pass / Fail): [ ]
+
+--------------------------------------------------------------------------------
+MÃ TEST CASE: TC_54
+--------------------------------------------------------------------------------
+- Chức năng (Feature): Bảo mật phân quyền
+- Mục đích test (Test Objective): Hệ thống chặn người dùng truy cập URL trái phép
+- Điều kiện test (Test precondition): Đã đăng nhập vai trò Bệnh nhân
+- Các bước test (Test procedure):
+  1. Gõ trực tiếp địa chỉ quản trị của Admin trên trình duyệt.
+- Dữ liệu test (Test data):
+  + URL: /admin/dashboard hoặc /admin/users
+- Kết quả mong đợi (Expected result): Hệ thống chặn truy cập, tự động chuyển hướng người dùng sang trang báo lỗi /unauthorized.
+- Kết quả (Pass / Fail): [ ]
+================================================================================

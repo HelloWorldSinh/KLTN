@@ -66,196 +66,199 @@ export const UserProfilePage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        {/* Header Background */}
-        <div className="h-32 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+            <UserCircle className="text-primary h-8 w-8" />
+            Hồ sơ cá nhân
+          </h1>
+          <p className="text-gray-500 mt-1">Cập nhật thông tin tài khoản, liên hệ và chuyên môn của bạn.</p>
+        </div>
+      </div>
 
-        <div className="px-8 pb-8">
-          <div className="relative flex justify-between items-end -mt-12 mb-6">
-            <div className="p-1 bg-white rounded-2xl shadow-md">
-              <div className="w-24 h-24 bg-slate-100 rounded-xl flex items-center justify-center text-indigo-600">
-                <UserCircle size={64} strokeWidth={1.5} />
+      <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+        {/* Profile Summary Badge */}
+        <div className="flex items-center gap-4 pb-6 border-b border-slate-100 mb-8">
+          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary font-black text-xl border border-primary/15 shrink-0">
+            {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : <User />}
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">{profile?.fullName}</h2>
+            <span className="inline-block mt-1.5 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider">
+              {profile?.role}
+            </span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Basic Info Section */}
+          <div>
+            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <User size={20} className="text-primary" />
+              Thông tin cơ bản
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Họ và tên</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={profile?.fullName || ''}
+                    onChange={handleInputChange}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
+                    required
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex-1 ml-6 mb-2">
-              <h1 className="text-2xl font-bold text-slate-800">{profile?.fullName}</h1>
-              <p className="text-slate-500 flex items-center gap-1">
-                <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-semibold uppercase tracking-wider">
-                  {profile?.role}
-                </span>
-              </p>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="email"
+                    name="email"
+                    value={profile?.email || ''}
+                    onChange={handleInputChange}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Số điện thoại (Cố định)</label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="text"
+                    value={profile?.phone || ''}
+                    disabled
+                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Ngày sinh</label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="date"
+                    name="dob"
+                    value={profile?.dob || ''}
+                    onChange={handleInputChange}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Giới tính</label>
+                <select
+                  name="gender"
+                  value={profile?.gender || ''}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-white text-sm"
+                >
+                  <option value="">Chọn giới tính</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                  <option value="Khác">Khác</option>
+                </select>
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-slate-700">Địa chỉ</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3 text-slate-400" size={18} />
+                  <textarea
+                    name="address"
+                    value={profile?.address || ''}
+                    onChange={handleInputChange}
+                    rows={2}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Basic Info Section */}
-            <div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                <User size={20} className="text-indigo-600" />
-                Thông tin cơ bản
+          {/* Doctor specific fields (Only for DOCTOR role) */}
+          {profile?.role === 'DOCTOR' && (
+            <div className="pt-6 border-t border-slate-100">
+              <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <Briefcase size={20} className="text-primary" />
+                Thông tin chuyên môn
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Họ và tên</label>
+                  <label className="text-sm font-medium text-slate-700">Chuyên khoa</label>
+                  <select
+                    name="specialtyId"
+                    value={profile?.specialtyId || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-white text-sm"
+                  >
+                    <option value="">Chọn chuyên khoa</option>
+                    {specialties.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">Học vị / Bằng cấp</label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
                       type="text"
-                      name="fullName"
-                      value={profile?.fullName || ''}
+                      name="degree"
+                      value={profile?.degree || ''}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                      required
+                      placeholder="Ví dụ: Thạc sĩ, Bác sĩ CKI..."
+                      className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Email</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input
-                      type="email"
-                      name="email"
-                      value={profile?.email || ''}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Số điện thoại (Cố định)</label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input
-                      type="text"
-                      value={profile?.phone || ''}
-                      disabled
-                      className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 cursor-not-allowed"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Ngày sinh</label>
+                  <label className="text-sm font-medium text-slate-700">Ngày bắt đầu làm việc</label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
                       type="date"
-                      name="dob"
-                      value={profile?.dob || ''}
+                      name="startWorkingDate"
+                      value={profile?.startWorkingDate || ''}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Giới tính</label>
-                  <select
-                    name="gender"
-                    value={profile?.gender || ''}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white"
-                  >
-                    <option value="">Chọn giới tính</option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                    <option value="Khác">Khác</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-700">Địa chỉ</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 text-slate-400" size={18} />
-                    <textarea
-                      name="address"
-                      value={profile?.address || ''}
-                      onChange={handleInputChange}
-                      rows={2}
-                      className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                      className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
                     />
                   </div>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Doctor specific fields (Only for DOCTOR role) */}
-            {profile?.role === 'DOCTOR' && (
-              <div className="pt-6 border-t border-slate-100">
-                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                  <Briefcase size={20} className="text-indigo-600" />
-                  Thông tin chuyên môn
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Chuyên khoa</label>
-                    <select
-                      name="specialtyId"
-                      value={profile?.specialtyId || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-white"
-                    >
-                      <option value="">Chọn chuyên khoa</option>
-                      {specialties.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Học vị / Bằng cấp</label>
-                    <div className="relative">
-                      <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input
-                        type="text"
-                        name="degree"
-                        value={profile?.degree || ''}
-                        onChange={handleInputChange}
-                        placeholder="Ví dụ: Thạc sĩ, Bác sĩ CKI..."
-                        className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Ngày bắt đầu làm việc</label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                      <input
-                        type="date"
-                        name="startWorkingDate"
-                        value={profile?.startWorkingDate || ''}
-                        onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-end pt-4">
-              <button
-                type="submit"
-                disabled={saving}
-                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 active:scale-95 transition-all shadow-md shadow-indigo-200 disabled:opacity-50 disabled:active:scale-100"
-              >
-                <Save size={18} />
-                {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="flex justify-end pt-4">
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark active:scale-95 transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:active:scale-100 cursor-pointer"
+            >
+              <Save size={18} />
+              {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

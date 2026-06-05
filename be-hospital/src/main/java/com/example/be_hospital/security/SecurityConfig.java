@@ -32,7 +32,8 @@ public class SecurityConfig {
             "/login",
             "/register",
             "/home",
-            "/api/chat"
+            "/error",
+            "/api/chatbot/**"
     };
 
     @Bean

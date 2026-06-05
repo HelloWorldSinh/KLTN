@@ -23,4 +23,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
             @Param("endTime") LocalTime endTime);
 
     List<Schedule> findByDoctorId(int doctorId);
+
+    // === QUEUE: Tìm tất cả schedule của bác sĩ trong ngày cụ thể ===
+    List<Schedule> findByDoctorIdAndWorkDate(int doctorId, LocalDate workDate);
+    long countByStatus(String status);
 }

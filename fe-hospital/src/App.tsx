@@ -4,17 +4,26 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { UserManagement } from './pages/UserManagement';
 import { MedicineManagement } from './pages/MedicineManagement';
 import { SpecialtyManagement } from './pages/SpecialtyManagement';
 import { ScheduleManagement } from './pages/ScheduleManagement';
 import { UserProfilePage } from './pages/UserProfilePage';
 import { PatientBooking } from './pages/PatientBooking';
+import { PatientDashboard } from './pages/PatientDashboard';
 import { MyAppointments } from './pages/MyAppointments';
 import { DoctorAppointments } from './pages/DoctorAppointments';
 import { DoctorSchedule } from './pages/DoctorSchedule';
 import { ExaminationPage } from './pages/ExaminationPage';
+import { PatientQueue } from './pages/PatientQueue';
+import { DoctorQueue } from './pages/DoctorQueue';
+import { StaffQueue } from './pages/StaffQueue';
 import { useAuthStore } from './store/authStore';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster, ToastBar } from 'react-hot-toast';
+import { useEffect } from 'react';
+import { Home } from './pages/Home';
+import { X } from 'lucide-react';
+import { useSSE } from './hooks/useSSE';
 
 // Mock empty pages for routing structure
 const MockPage = ({ title }: { title: string }) => (
@@ -25,23 +34,70 @@ const MockPage = ({ title }: { title: string }) => (
 );
 
 const App = () => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { logout, token, isAuthenticated } = useAuthStore();
 
-  const getHomeNavigate = () => {
-    if (!isAuthenticated) return '/login';
-    switch (user?.role) {
-      case 'ADMIN': return '/admin/dashboard';
-      case 'DOCTOR': return '/doctor/patients';
-      case 'STAFF': return '/staff/appointments';
-      case 'PATIENT': return '/patient/dashboard';
-      default: return '/login';
+  // Kết nối SSE toàn cục để nhận thông báo thời gian thực (ví dụ: thông báo hủy lịch)
+  useSSE({
+    url: isAuthenticated && token ? `http://localhost:1111/sse/connect?token=${token}` : '',
+    enabled: isAuthenticated && !!token,
+    eventListeners: {
+      notification: (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          toast.error(`${data.title}: ${data.content}`, {
+            duration: 10000 // Giữ thông báo trong 10 giây
+          });
+          // Phát sự kiện custom thông báo cho các component khác (như Header) cập nhật
+          window.dispatchEvent(new Event('new-notification'));
+        } catch (err) {
+          console.error('Lỗi phân tích thông báo SSE:', err);
+        }
+      }
     }
-  };
+  }, [token, isAuthenticated]);
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      logout();
+    };
+
+    window.addEventListener('unauthorized-api-call', handleUnauthorized);
+    return () => {
+      window.removeEventListener('unauthorized-api-call', handleUnauthorized);
+    };
+  }, [logout]);
 
   return (
     <BrowserRouter>
-      <Toaster position="top-right" />
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 8000, // Keep toast visible for 8 seconds
+        }}
+      >
+        {(t) => (
+          <ToastBar toast={t}>
+            {({ icon, message }) => (
+              <>
+                {icon}
+                {message}
+                {t.type !== 'loading' && (
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="p-1 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-600 shrink-0 ml-2 cursor-pointer"
+                    title="Đóng"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </>
+            )}
+          </ToastBar>
+        )}
+      </Toaster>
       <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
@@ -51,8 +107,8 @@ const App = () => {
             
             {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-              <Route path="dashboard" element={<MockPage title="Bảng thống kê Admin" />} />
-              <Route path="users" element={<AdminDashboard />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<UserManagement />} />
               <Route path="specialties" element={<SpecialtyManagement />} />
               <Route path="schedules" element={<ScheduleManagement />} />
               <Route path="medicines" element={<MedicineManagement />} />
@@ -61,6 +117,7 @@ const App = () => {
             {/* Doctor Routes */}
             <Route path="/doctor" element={<ProtectedRoute allowedRoles={['DOCTOR']} />}>
               <Route path="patients" element={<DoctorAppointments />} />
+              <Route path="queue" element={<DoctorQueue />} />
               <Route path="examination/:appointmentId" element={<ExaminationPage />} />
               <Route path="schedule" element={<DoctorSchedule />} />
               <Route path="diagnosis" element={<MockPage title="Chẩn đoán & Đơn thuốc" />} />
@@ -68,23 +125,22 @@ const App = () => {
 
             {/* Staff Routes */}
             <Route path="/staff" element={<ProtectedRoute allowedRoles={['STAFF']} />}>
-              <Route path="appointments" element={<MockPage title="Tất cả lịch hẹn" />} />
+              <Route path="appointments" element={<StaffQueue />} />
               <Route path="confirmations" element={<MockPage title="Xác nhận lịch hẹn" />} />
             </Route>
 
             {/* Patient Routes */}
             <Route path="/patient" element={<ProtectedRoute allowedRoles={['PATIENT']} />}>
-              <Route path="dashboard" element={<MockPage title="Tổng quan Bệnh nhân" />} />
+              <Route path="dashboard" element={<PatientDashboard />} />
               <Route path="book" element={<PatientBooking />} />
               <Route path="schedule" element={<MyAppointments />} />
+              <Route path="queue" element={<PatientQueue />} />
               <Route path="history" element={<MockPage title="Lịch sử khám bệnh" />} />
-              <Route path="doctors" element={<MockPage title="Tìm kiếm bác sĩ" />} />
+              <Route path="doctors" element={<Navigate to="/patient/book" replace />} />
             </Route>
 
             {/* Common Profile Route */}
             <Route path="/profile" element={<UserProfilePage />} />
-
-            <Route path="/" element={<Navigate to={getHomeNavigate()} replace />} />
           </Route>
         </Route>
         

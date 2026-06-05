@@ -12,4 +12,11 @@ import lombok.Setter;
 public class ResponseObject {
     private boolean status; // true for success, false for failure
     private String message;
+    private Object data;
+
+    public ResponseObject(boolean status, String message) {
+        this.status = status;
+        this.message = message;
+        this.data = null;
+    }
 }

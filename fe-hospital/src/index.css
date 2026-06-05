@@ -1,15 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0056b3;
-  --color-primary-light: #3380cc;
-  --color-primary-dark: #004085;
-  --color-secondary: #f3f4f6;
-  --color-secondary-dark: #e5e7eb;
+  --color-primary: #0f766e;       /* Teal 700 - Đậm, đáng tin cậy */
+  --color-primary-light: #14b8a6; /* Teal 500 - Sáng, trẻ trung */
+  --color-primary-dark: #115e59;  /* Teal 800 - Sâu, cao cấp */
+  --color-secondary: #f0f9ff;     /* Sky 50 - Nền xanh nhạt thẩm mỹ, sạch sẽ */
+  --color-secondary-dark: #e0f2fe;/* Sky 100 - Nền xanh đậm hơn chút cho các đường viền/nền phụ */
+  --font-sans: "Plus Jakarta Sans", sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-secondary text-gray-900;
+    @apply bg-secondary text-slate-800 antialiased;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
+}
+
+@layer utilities {
+  .animate-slide-up {
+    animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

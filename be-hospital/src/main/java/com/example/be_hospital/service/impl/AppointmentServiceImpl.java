@@ -63,9 +63,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setScheduleId(schedule.getId());
         appointment.setStatus(AppointmentStatus.CONFIRMED);
 
+        // Gán số thứ tự trong hàng đợi
+        int currentCount = appointmentRepository.countByScheduleId(schedule.getId());
+        appointment.setQueueOrder(currentCount + 1);
+
         appointmentRepository.save(appointment);
 
-        return new ResponseObject(true, "Đặt lịch khám thành công");
+        return new ResponseObject(true, "Đặt lịch khám thành công", appointment.getQueueOrder());
     }
 
     @Override

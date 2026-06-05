@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Calendar, Clock, MapPin, User, ChevronRight, CheckCircle, XCircle, AlertCircle, Loader2, FileText, Pill } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Calendar, Clock, MapPin, CheckCircle, XCircle, AlertCircle, Loader2, FileText, Pill } from 'lucide-react';
 import { appointmentService, type AppointmentDTO } from '../services/appointment.service';
 import { examinationService, type ExaminationResponse } from '../services/examination.service';
 import toast from 'react-hot-toast';
@@ -88,6 +88,10 @@ export const MyAppointments = () => {
         return <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 rounded-full text-emerald-600 font-bold border border-emerald-200/50 text-xs"><CheckCircle className="w-3.5 h-3.5" /> Đã hoàn thành</span>;
       case 'CANCELLED':
         return <span className="flex items-center gap-1.5 px-3 py-1 bg-red-50 rounded-full text-red-600 font-bold border border-red-200/50 text-xs"><XCircle className="w-3.5 h-3.5" /> Đã hủy</span>;
+      case 'NO_SHOW':
+        return <span className="flex items-center gap-1.5 px-3 py-1 bg-red-50 rounded-full text-red-600 font-bold border border-red-200/50 text-xs"><XCircle className="w-3.5 h-3.5" /> Không đến khám</span>;
+      case 'SYSTEM_CANCELLED':
+        return <span className="flex items-center gap-1.5 px-3 py-1 bg-red-50 rounded-full text-red-600 font-bold border border-red-200/50 text-xs"><XCircle className="w-3.5 h-3.5" /> Hệ thống hủy</span>;
       default:
         return null;
     }
@@ -97,7 +101,7 @@ export const MyAppointments = () => {
     .filter(app => {
       if (filterType === 'UPCOMING') return app.status === 'PENDING' || app.status === 'CONFIRMED';
       if (filterType === 'COMPLETED') return app.status === 'COMPLETED';
-      if (filterType === 'CANCELLED') return app.status === 'CANCELLED';
+      if (filterType === 'CANCELLED') return app.status === 'CANCELLED' || app.status === 'NO_SHOW' || app.status === 'SYSTEM_CANCELLED';
       return true;
     })
     .sort((a, b) => {
@@ -131,15 +135,15 @@ export const MyAppointments = () => {
       <div className="flex gap-2 p-1.5 bg-white rounded-2xl shadow-sm border border-gray-100 max-w-fit overflow-x-auto custom-scrollbar">
         {[
           { id: 'UPCOMING', label: 'Sắp đến' },
-          { id: 'COMPLETED', label: 'Đã hoàn thành' },
+          { id: 'COMPLETED', label: 'Đã khám' },
           { id: 'CANCELLED', label: 'Đã hủy' }
         ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setFilterType(tab.id as any)}
             className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${filterType === tab.id
-                ? 'bg-primary/10 text-primary shadow-sm'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              ? 'bg-primary/10 text-primary shadow-sm'
+              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
           >
             {tab.label}
@@ -166,6 +170,14 @@ export const MyAppointments = () => {
                   <AppointmentStatusBadge status={app.status} />
                   <h3 className="text-xl font-bold text-gray-900 mt-3 mb-1">BS. {app.doctorName}</h3>
                   <p className="text-gray-500 text-sm font-medium">{app.specialtyName}</p>
+                  {(app.status === 'CANCELLED' || app.status === 'NO_SHOW' || app.status === 'SYSTEM_CANCELLED') && app.cancelReason && (
+                    <div className="mt-3 text-sm text-red-600 bg-red-50/50 rounded-xl p-3 border border-red-100/50 flex items-start gap-2 max-w-md">
+                      <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                      <div>
+                        <span className="font-bold text-red-700">Lý do hủy:</span> {app.cancelReason}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="text-xs uppercase font-bold text-gray-400 mb-1">Ngày khám</p>
@@ -277,76 +289,78 @@ export const MyAppointments = () => {
                 <FileText className="w-6 h-6 text-primary" />
                 Kết quả khám bệnh
               </h3>
-              <button 
-                 onClick={() => setExamModal({ isOpen: false, appointmentId: null, data: null, loading: false })}
-                 className="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors"
+              <button
+                onClick={() => setExamModal({ isOpen: false, appointmentId: null, data: null, loading: false })}
+                className="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <XCircle className="w-6 h-6" />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
               {examModal.loading ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                   <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-                   <p className="text-gray-500 font-medium">Đang tải hồ sơ...</p>
+                  <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+                  <p className="text-gray-500 font-medium">Đang tải hồ sơ...</p>
                 </div>
               ) : examModal.data ? (
                 <div className="space-y-8">
                   {/* Diagnosis Section */}
                   <div>
                     <h4 className="font-bold text-gray-800 flex items-center gap-2 mb-4 border-b pb-2">
-                       <AlertCircle className="w-5 h-5 text-red-500" />
-                       Chẩn đoán
+                      <AlertCircle className="w-5 h-5 text-red-500" />
+                      Chẩn đoán
                     </h4>
                     <div className="bg-gray-50 p-4 rounded-2xl space-y-3">
-                       <div>
-                         <p className="text-sm font-bold text-gray-500 mb-1">Triệu chứng của bệnh nhân:</p>
-                         <p className="text-gray-800 font-medium">{examModal.data.symptom || 'Không có ghi nhận'}</p>
-                       </div>
-                       <div>
-                         <p className="text-sm font-bold text-red-500 mb-1">Kết luận của bác sĩ:</p>
-                         <p className="text-gray-800 font-bold bg-white p-3 rounded-xl border border-gray-100">
-                           {examModal.data.diagnosis || 'Chưa cập nhật...'}
-                         </p>
-                       </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-500 mb-1">Triệu chứng của bệnh nhân:</p>
+                        <p className="text-gray-800 font-medium">{examModal.data.symptom || 'Không có ghi nhận'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-red-500 mb-1">Kết luận của bác sĩ:</p>
+                        <p className="text-gray-800 font-bold bg-white p-3 rounded-xl border border-gray-100">
+                          {examModal.data.diagnosis || 'Chưa cập nhật...'}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
                   {/* Prescription Section */}
                   <div>
                     <h4 className="font-bold text-gray-800 flex items-center gap-2 mb-4 border-b pb-2">
-                       <Pill className="w-5 h-5 text-emerald-500" />
-                       Đơn thuốc chỉ định
+                      <Pill className="w-5 h-5 text-emerald-500" />
+                      Đơn thuốc chỉ định
                     </h4>
                     {examModal.data.prescriptionDetails && examModal.data.prescriptionDetails.length > 0 ? (
                       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                         <table className="w-full text-left text-sm">
-                           <thead className="bg-gray-50">
-                             <tr>
-                               <th className="px-4 py-3 font-bold text-gray-500">Thuốc</th>
-                               <th className="px-4 py-3 font-bold text-gray-500 w-24 text-center">SL</th>
-                               <th className="px-4 py-3 font-bold text-gray-500">Liều dùng</th>
-                             </tr>
-                           </thead>
-                           <tbody className="divide-y divide-gray-50">
-                             {examModal.data.prescriptionDetails.map((med, idx) => (
-                               <tr key={med.medicineId} className="hover:bg-gray-50 transition-colors">
-                                 <td className="px-4 py-4 font-bold text-gray-800 flex items-center gap-3">
-                                     <span className="w-6 h-6 flex items-center justify-center bg-emerald-100 text-emerald-600 rounded-full text-xs">{idx + 1}</span>
-                                     {med.medicineName}
-                                 </td>
-                                 <td className="px-4 py-4 text-center font-black text-primary text-lg">{med.quantity}</td>
-                                 <td className="px-4 py-4 text-gray-600 font-medium">{med.dosage}</td>
-                               </tr>
-                             ))}
-                           </tbody>
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-4 py-3 font-bold text-gray-500">Thuốc</th>
+                              <th className="px-4 py-3 font-bold text-gray-500 w-24 text-center">Đơn vị</th>
+                              <th className="px-4 py-3 font-bold text-gray-500 w-24 text-center">SL</th>
+                              <th className="px-4 py-3 font-bold text-gray-500">Liều dùng</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-50">
+                            {examModal.data.prescriptionDetails.map((med, idx) => (
+                              <tr key={med.medicineId} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-4 py-4 font-bold text-gray-800 flex items-center gap-3">
+                                  <span className="w-6 h-6 flex items-center justify-center bg-emerald-100 text-emerald-600 rounded-full text-xs">{idx + 1}</span>
+                                  {med.medicineName}
+                                </td>
+                                <td className="px-4 py-4 text-center text-gray-500 font-medium text-sm">{med.medicineUnit || '—'}</td>
+                                <td className="px-4 py-4 text-center font-black text-primary text-lg">{med.quantity}</td>
+                                <td className="px-4 py-4 text-gray-600 font-medium">{med.dosage}</td>
+                              </tr>
+                            ))}
+                          </tbody>
                         </table>
                       </div>
                     ) : (
                       <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200 shadow-inner">
-                         <Pill className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                         <p className="text-gray-500 font-medium">Bác sĩ không kê đơn thuốc cho lịch khám này.</p>
+                        <Pill className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500 font-medium">Bác sĩ không kê đơn thuốc cho lịch khám này.</p>
                       </div>
                     )}
                   </div>
@@ -355,14 +369,14 @@ export const MyAppointments = () => {
                 <div className="text-center py-12 text-gray-500 font-medium">Không tìm thấy dữ liệu kết quả khám.</div>
               )}
             </div>
-            
+
             <div className="p-4 border-t border-gray-100 flex justify-end bg-gray-50/50">
-               <button 
-                 onClick={() => setExamModal({ isOpen: false, appointmentId: null, data: null, loading: false })}
-                 className="px-6 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold transition-colors"
-               >
-                 Đóng lại
-               </button>
+              <button
+                onClick={() => setExamModal({ isOpen: false, appointmentId: null, data: null, loading: false })}
+                className="px-6 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-bold transition-colors"
+              >
+                Đóng lại
+              </button>
             </div>
           </div>
         </div>

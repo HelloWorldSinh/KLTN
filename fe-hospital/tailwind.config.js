@@ -5,15 +5,18 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+      },
       colors: {
         primary: {
-          DEFAULT: '#0056b3',
-          light: '#3380cc',
-          dark: '#004085',
+          DEFAULT: '#0f766e',
+          light: '#14b8a6',
+          dark: '#115e59',
         },
         secondary: {
-          DEFAULT: '#f3f4f6', 
-          dark: '#e5e7eb'
+          DEFAULT: '#f8fafc', 
+          dark: '#e2e8f0'
         }
       }
     },

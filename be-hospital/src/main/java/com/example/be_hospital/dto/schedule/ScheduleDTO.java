@@ -22,4 +22,6 @@ public class ScheduleDTO {
     private int slot;
     private String room;
     private Integer appointmentCount; // To check if it can be edited/deleted
+    private String status;
+    private String cancelReason;
 }

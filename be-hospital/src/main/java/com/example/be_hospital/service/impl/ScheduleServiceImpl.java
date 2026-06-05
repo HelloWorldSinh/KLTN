@@ -18,9 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.example.be_hospital.entity.Appointment;
+import com.example.be_hospital.entity.AppointmentStatus;
+import com.example.be_hospital.entity.Notification;
+import com.example.be_hospital.repository.NotificationRepository;
+import com.example.be_hospital.service.SseService;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
+
+    private static final Logger log = LoggerFactory.getLogger(ScheduleServiceImpl.class);
 
     @Autowired
     private ScheduleRepository scheduleRepository;
@@ -33,6 +42,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Autowired
     private DoctorProfileRepository doctorProfileRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
+    private SseService sseService;
 
     @Override
     public List<ScheduleDTO> getAllSchedules() {
@@ -79,6 +94,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             schedule.setEndTime(request.getEndTime());
             schedule.setSlot(request.getSlot());
             schedule.setRoom(request.getRoom());
+            schedule.setStatus("ACTIVE");
             scheduleRepository.save(schedule);
         }
 
@@ -142,6 +158,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                     if (date != null && !s.getWorkDate().equals(date)) return false;
                     if (doctorId != null && s.getDoctorId() != doctorId) return false;
                     if (s.getWorkDate().isBefore(LocalDate.now())) return false;
+                    if (s.getStatus() != null && !"ACTIVE".equals(s.getStatus()) && !"REJECTED_CANCEL".equals(s.getStatus())) return false;
                     if (specialtyId != null) {
                         com.example.be_hospital.entity.DoctorProfile profile = 
                             doctorProfileRepository.findById(s.getDoctorId()).orElse(null);
@@ -165,11 +182,113 @@ public class ScheduleServiceImpl implements ScheduleService {
         dto.setSlot(schedule.getSlot());
         dto.setRoom(schedule.getRoom());
         dto.setAppointmentCount(appointmentRepository.countByScheduleId(schedule.getId()));
+        dto.setStatus(schedule.getStatus() != null ? schedule.getStatus() : "ACTIVE");
+        dto.setCancelReason(schedule.getCancelReason());
 
         userRepository.findById(schedule.getDoctorId()).ifPresent(user -> {
             dto.setDoctorName(user.getFullName());
         });
 
         return dto;
+    }
+
+    @Override
+    @Transactional
+    public ResponseObject requestCancelSchedule(int id, String reason) {
+        Optional<Schedule> optional = scheduleRepository.findById(id);
+        if (optional.isEmpty()) {
+            return new ResponseObject(false, "Không tìm thấy lịch làm việc");
+        }
+        Schedule schedule = optional.get();
+
+        // Kiểm tra điều kiện: Ngày hủy - Ngày hiện tại >= 2 ngày
+        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), schedule.getWorkDate());
+        if (daysBetween < 2) {
+            return new ResponseObject(false, "Không đủ thời gian tối thiểu (yêu cầu hủy phải trước ít nhất 2 ngày)");
+        }
+
+        schedule.setStatus("PENDING_CANCEL");
+        schedule.setCancelReason(reason);
+        scheduleRepository.save(schedule);
+
+        // Ghi nhận lý do hủy vào lịch sử (Log)
+        log.info("Bác sĩ yêu cầu hủy lịch làm việc. ID lịch: {}, Ngày trực: {}, Lý do: {}", 
+                id, schedule.getWorkDate(), reason);
+
+        return new ResponseObject(true, "Đã gửi yêu cầu, chờ phê duyệt");
+    }
+
+    @Override
+    @Transactional
+    public ResponseObject approveCancelSchedule(int id) {
+        Optional<Schedule> optional = scheduleRepository.findById(id);
+        if (optional.isEmpty()) {
+            return new ResponseObject(false, "Không tìm thấy lịch làm việc");
+        }
+        Schedule schedule = optional.get();
+        if (!"PENDING_CANCEL".equals(schedule.getStatus())) {
+            return new ResponseObject(false, "Lịch làm việc không ở trạng thái chờ hủy");
+        }
+
+        schedule.setStatus("CANCELLED");
+        scheduleRepository.save(schedule);
+
+        // Hủy toàn bộ lịch hẹn liên quan (appointment.status = 'CANCELLED')
+        List<Appointment> appointments = appointmentRepository.findByScheduleId(id);
+        for (Appointment app : appointments) {
+            if (app.getStatus() != AppointmentStatus.CANCELLED &&
+                app.getStatus() != AppointmentStatus.COMPLETED) {
+                
+                app.setStatus(AppointmentStatus.CANCELLED);
+                app.setCancelReason("Bị hệ thống hủy do bác sĩ thay đổi lịch trực.");
+                appointmentRepository.save(app);
+
+                // Thêm thông báo vào bảng notification cho các bệnh nhân
+                Notification notification = new Notification();
+                notification.setUserId(app.getPatientId());
+                notification.setTitle("Lịch hẹn khám bệnh bị hủy");
+                notification.setContent("Lịch hẹn của bạn vào ca " + schedule.getStartTime().toString().substring(0, 5) + 
+                    " - " + schedule.getEndTime().toString().substring(0, 5) + " ngày " + schedule.getWorkDate() +
+                    " tại phòng " + schedule.getRoom() + " đã bị hủy bởi hệ thống do bác sĩ thay đổi lịch trực.");
+                notification.setRead(false);
+                notificationRepository.save(notification);
+
+                // Gửi thông báo real-time qua SSE đến bệnh nhân
+                sseService.sendNotification(
+                    app.getPatientId(),
+                    notification.getTitle(),
+                    notification.getContent()
+                );
+            }
+        }
+
+        log.info("Admin đã phê duyệt yêu cầu hủy lịch làm việc. ID: {}", id);
+
+        return new ResponseObject(true, "Phê duyệt hủy lịch thành công");
+    }
+
+    @Override
+    @Transactional
+    public ResponseObject rejectCancelSchedule(int id, String reason) {
+        Optional<Schedule> optional = scheduleRepository.findById(id);
+        if (optional.isEmpty()) {
+            return new ResponseObject(false, "Không tìm thấy lịch làm việc");
+        }
+        Schedule schedule = optional.get();
+        if (!"PENDING_CANCEL".equals(schedule.getStatus())) {
+            return new ResponseObject(false, "Lịch làm việc không ở trạng thái chờ hủy");
+        }
+
+        // Khôi phục trạng thái hoạt động (bệnh nhân có thể đăng ký bình thường)
+        // Lưu trạng thái REJECTED_CANCEL để bác sĩ biết và hiển thị trong danh sách từ chối
+        schedule.setStatus("REJECTED_CANCEL");
+        if (reason != null && !reason.trim().isEmpty()) {
+            schedule.setCancelReason("Từ chối hủy: " + reason);
+        }
+        scheduleRepository.save(schedule);
+
+        log.info("Admin đã từ chối yêu cầu hủy lịch làm việc. ID: {}, Lý do từ chối: {}", id, reason);
+
+        return new ResponseObject(true, "Từ chối hủy lịch thành công");
     }
 }

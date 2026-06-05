@@ -64,9 +64,11 @@ CREATE TABLE `appointment` (
   `id` int PRIMARY KEY,
   `patient_id` int NOT NULL,
   `schedule_id` int NOT NULL,
-  `status` ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'),
+  `status` ENUM ('PENDING', 'CONFIRMED', 'WAITING', 'IN_PROGRESS', 'COMPLETED', 'MISSED', 'NO_SHOW', 'CANCELLED', 'SYSTEM_CANCELLED'),
   `cancel_reason` nvarchar,
-  `created_at` datetime
+  `created_at` datetime,
+  `queue_order` int,
+  `absent_at` datetime
 );
 
 CREATE TABLE `schedule` (
@@ -76,7 +78,9 @@ CREATE TABLE `schedule` (
   `start_time` time,
   `end_time` time,
   `slot` int,
-  `room` nvarchar
+  `room` nvarchar,
+  `status` ENUM ('ACTIVE', 'PENDING_CANCEL', 'CANCELLED') NOT NULL DEFAULT 'ACTIVE',
+  `cancel_reason` nvarchar
 );
 
 ALTER TABLE `doctor_profile` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);

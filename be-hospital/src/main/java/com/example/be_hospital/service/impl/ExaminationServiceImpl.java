@@ -7,12 +7,11 @@ import com.example.be_hospital.dto.examination.PrescriptionRequest;
 import com.example.be_hospital.entity.*;
 import com.example.be_hospital.repository.*;
 import com.example.be_hospital.service.ExaminationService;
+import com.example.be_hospital.service.SseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +33,9 @@ public class ExaminationServiceImpl implements ExaminationService {
 
     @Autowired
     private MedicineRepository medicineRepository;
+
+    @Autowired
+    private SseService sseService;
 
     @Override
     public ExaminationResponse getExamination(int appointmentId) {
@@ -57,7 +59,10 @@ public class ExaminationServiceImpl implements ExaminationService {
                             dr.setQuantity(d.getQuantity());
                             dr.setDosage(d.getDosage());
                             medicineRepository.findById(d.getMedicineId())
-                                    .ifPresent(m -> dr.setMedicineName(m.getName()));
+                                    .ifPresent(m -> {
+                                        dr.setMedicineName(m.getName());
+                                        dr.setMedicineUnit(m.getUnit());
+                                    });
                             return dr;
                         }).collect(Collectors.toList());
                 response.setPrescriptionDetails(details);
@@ -145,6 +150,9 @@ public class ExaminationServiceImpl implements ExaminationService {
 
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointmentRepository.save(appointment);
+
+        // Phát sự kiện SSE cập nhật hàng đợi thời gian thực
+        sseService.broadcastQueueUpdate(appointment.getScheduleId());
 
         return new ResponseObject(true, "Kết thúc ca khám thành công. Hồ sơ đã được đóng.");
     }

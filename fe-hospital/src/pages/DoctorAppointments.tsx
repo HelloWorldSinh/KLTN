@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Calendar,
   Clock,
   MapPin,
   User,
   Search,
-  Filter,
   Phone,
   MapPin as MapPinIcon,
   CalendarDays,
   ChevronRight,
-  Loader2,
-  AlertCircle
+  Loader2
 } from 'lucide-react';
 import { appointmentService, type DoctorAppointmentDTO } from '../services/appointment.service';
+import { queueService } from '../services/queue.service';
 import toast from 'react-hot-toast';
 
 export const DoctorAppointments = () => {
@@ -23,8 +21,24 @@ export const DoctorAppointments = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const today = new Date().toISOString().split('T')[0];
-  const isToday = selectedDate === today;
+
+  const handleAction = async (app: DoctorAppointmentDTO) => {
+    if (app.status === 'CONFIRMED' || app.status === 'WAITING') {
+      try {
+        const res = await queueService.startExamination(app.appointmentId);
+        if (res.status) {
+          toast.success(res.message);
+          navigate(`/doctor/examination/${app.appointmentId}`);
+        } else {
+          toast.error(res.message);
+        }
+      } catch (err) {
+        toast.error('Lỗi khi bắt đầu khám');
+      }
+    } else {
+      navigate(`/doctor/examination/${app.appointmentId}`);
+    }
+  };
 
   const fetchAppointments = async () => {
     setLoading(true);
@@ -47,6 +61,10 @@ export const DoctorAppointments = () => {
       app.patientPhone.includes(searchTerm);
     const matchesDate = app.workDate === selectedDate;
     return matchesSearch && matchesDate;
+  }).sort((a, b) => {
+    if (a.status === 'COMPLETED' && b.status !== 'COMPLETED') return 1;
+    if (a.status !== 'COMPLETED' && b.status === 'COMPLETED') return -1;
+    return 0;
   });
 
   const getStatusBadge = (status: string) => {
@@ -129,7 +147,7 @@ export const DoctorAppointments = () => {
                         </div>
                         <div>
                           <p
-                            onClick={() => navigate(`/doctor/examination/${app.appointmentId}`)}
+                            onClick={() => handleAction(app)}
                             className="font-bold text-gray-900 group-hover:text-primary transition-colors cursor-pointer"
                           >
                             {app.patientName}
@@ -171,7 +189,7 @@ export const DoctorAppointments = () => {
                     </td>
                     <td className="px-8 py-6 text-right">
                       <button
-                        onClick={() => navigate(`/doctor/examination/${app.appointmentId}`)}
+                        onClick={() => handleAction(app)}
                         title={app.status === 'COMPLETED' ? 'Xem lại hồ sơ' : 'Bắt đầu khám'}
                         className="p-2 hover:bg-white rounded-xl text-gray-400 hover:text-primary transition-all border border-transparent hover:border-gray-100 hover:shadow-sm"
                       >

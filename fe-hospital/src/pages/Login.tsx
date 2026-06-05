@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate, Link } from 'react-router-dom';
 import { Activity } from 'lucide-react';
+import { Header } from '../components/Header';
 
 export const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -22,6 +23,10 @@ export const Login = () => {
 
       const user = useAuthStore.getState().user;
 
+      if (user?.role === 'PATIENT') {
+        sessionStorage.setItem('justLoggedIn', 'true');
+      }
+
       switch (user?.role) {
         case 'ADMIN': navigate('/admin/dashboard'); break;
         case 'DOCTOR': navigate('/doctor/patients'); break;
@@ -36,13 +41,17 @@ export const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-secondary items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
-        <div className="flex flex-col items-center mb-6">
-          <Activity className="h-12 w-12 text-primary mb-2" />
-          <h2 className="text-2xl font-bold text-gray-800">Chào mừng đến với MediCare</h2>
-          <p className="text-sm text-gray-500">Đăng nhập vào tài khoản của bạn</p>
-        </div>
+    <div className="min-h-screen bg-secondary flex flex-col font-sans">
+      <Header />
+      <div className="flex-1 flex items-center justify-center p-4 py-12">
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 max-w-md w-full">
+          <div className="flex flex-col items-center mb-6">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 mb-3 animate-pulse">
+              <Activity className="h-6 w-6" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800">Chào mừng đến với MediCare</h2>
+            <p className="text-sm text-gray-500 mt-1">Đăng nhập vào tài khoản của bạn</p>
+          </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
           {error && (
@@ -94,5 +103,6 @@ export const Login = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };

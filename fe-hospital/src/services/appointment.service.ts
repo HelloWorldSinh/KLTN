@@ -10,7 +10,7 @@ export interface AppointmentDTO {
   startTime: string;
   endTime: string;
   room: string;
-  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+  status: 'PENDING' | 'CONFIRMED' | 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'NO_SHOW' | 'CANCELLED';
   cancelReason?: string;
   createdAt: string;
 }
@@ -27,7 +27,7 @@ export interface DoctorAppointmentDTO {
   startTime: string;
   endTime: string;
   room: string;
-  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+  status: 'PENDING' | 'CONFIRMED' | 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED' | 'NO_SHOW' | 'CANCELLED';
   cancelReason?: string;
   createdAt: string;
 }
