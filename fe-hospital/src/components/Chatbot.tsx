@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { chatWithBot, getChatHistory } from '../services/chatbot.service';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const SUGGESTED_QUESTIONS = [
   'Hướng dẫn đặt lịch khám bệnh',
@@ -130,12 +132,28 @@ const Chatbot = () => {
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] px-4 py-2.5 outline-none text-[14px] leading-relaxed whitespace-pre-wrap shadow-sm ${msg.sender === 'user'
-                      ? 'bg-gradient-to-br from-primary to-primary-dark text-white rounded-2xl rounded-br-sm'
+                  className={`max-w-[80%] px-4 py-2.5 outline-none text-[14px] leading-relaxed shadow-sm overflow-hidden ${msg.sender === 'user'
+                      ? 'bg-gradient-to-br from-primary to-primary-dark text-white rounded-2xl rounded-br-sm whitespace-pre-wrap'
                       : 'bg-white border border-gray-100 text-slate-700 rounded-2xl rounded-bl-sm'
                     }`}
                 >
-                  {msg.text}
+                  {msg.sender === 'user' ? (
+                    msg.text
+                  ) : (
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        strong: ({ node, ...props }) => <strong className="font-bold text-slate-900" {...props} />,
+                        ul: ({ node, ...props }) => <ul className="list-disc pl-4 my-1 space-y-1" {...props} />,
+                        ol: ({ node, ...props }) => <ol className="list-decimal pl-4 my-1 space-y-1" {...props} />,
+                        li: ({ node, ...props }) => <li className="text-[14px]" {...props} />,
+                        p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                        a: ({ node, ...props }) => <a className="text-primary hover:underline font-medium" target="_blank" rel="noopener noreferrer" {...props} />
+                      }}
+                    >
+                      {msg.text}
+                    </ReactMarkdown>
+                  )}
                 </div>
               </div>
             ))}

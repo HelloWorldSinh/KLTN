@@ -12,6 +12,7 @@ public class ChatIntentRouter {
         FAQ,
         SYMPTOM,
         TOOL_LOOKUP,
+        UNSUPPORTED_HOSPITAL_INFO,
         OUTSIDE_MEDICAL,
         GENERAL_MEDICAL
     }
@@ -24,6 +25,14 @@ public class ChatIntentRouter {
                 "chung khoan", "du bao thoi tiet", "giai phuong trinh", "viet bai van",
                 "dich sang tieng anh")) {
             return ChatIntent.OUTSIDE_MEDICAL;
+        }
+
+        if (isPriceQuestion(text) && !containsAny(text, "suc khoe xin viec", "kham xin viec")) {
+            return ChatIntent.UNSUPPORTED_HOSPITAL_INFO;
+        }
+
+        if (containsAny(text, "dia chi", "benh vien o dau", "phong kham o dau")) {
+            return ChatIntent.UNSUPPORTED_HOSPITAL_INFO;
         }
 
         if (containsAny(text,
@@ -44,6 +53,10 @@ public class ChatIntentRouter {
                 "bac si", "lich kham", "lich truc", "lich trong", "dat lich",
                 "danh sach chuyen khoa", "co nhung chuyen khoa", "chuyen khoa nao")) {
             return ChatIntent.TOOL_LOOKUP;
+        }
+
+        if (containsAny(text, "benh vien", "phong kham", "kham tong quat")) {
+            return ChatIntent.UNSUPPORTED_HOSPITAL_INFO;
         }
 
         return ChatIntent.GENERAL_MEDICAL;
@@ -68,12 +81,19 @@ public class ChatIntentRouter {
     }
 
     private boolean containsAny(String text, String... terms) {
+        String paddedText = " " + text + " ";
         for (String term : terms) {
-            if (text.contains(term)) {
+            if (paddedText.contains(" " + term.trim() + " ")) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean isPriceQuestion(String text) {
+        return containsAny(text,
+                "chi phi", "gia kham", "gia dich vu", "bao nhieu tien", "het bao nhieu",
+                "gia bao nhieu", "gia tien", "muc gia", "vien phi", "phi kham");
     }
 
     private String normalize(String text) {
@@ -85,6 +105,8 @@ public class ChatIntentRouter {
                 .replaceAll("\\p{M}", "")
                 .replace('\u0111', 'd')
                 .replace('\u0110', 'D')
-                .toLowerCase(Locale.ROOT);
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", " ")
+                .trim();
     }
 }

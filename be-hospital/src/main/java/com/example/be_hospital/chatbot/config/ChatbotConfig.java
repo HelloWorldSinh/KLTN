@@ -9,32 +9,41 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Map;
 
 @Configuration
+@PropertySource("classpath:application-llm.properties")
 public class ChatbotConfig {
 
     @Value("${llm.provider:deepseek}")
     private String llmProvider;
 
-    @Value("${llm.model:deepseek-v4-flash}")
-    private String llmModel;
+    @Value("${llm.timeout-seconds:120}")
+    private long timeoutSeconds;
 
-    @Value("${llm.base-url:https://api.deepseek.com}")
-    private String llmBaseUrl;
+    @Value("${llm.temperature:0.2}")
+    private double temperature;
 
-    @Value("${llm.api-key}")
-    private String llmApiKey;
+    @Value("${llm.max-output-tokens:1024}")
+    private Integer maxOutputTokens;
 
-    @Value("${llm.timeout-seconds:2000}")
-    private long llmTimeoutSeconds;
+    @Value("${llm.deepseek.model:deepseek-v4-flash}")
+    private String deepSeekModel;
 
-    @Value("${gemini.api.key:}")
+    @Value("${llm.deepseek.base-url:https://api.deepseek.com}")
+    private String deepSeekBaseUrl;
+
+    @Value("${llm.deepseek.api-key:}")
+    private String deepSeekApiKey;
+
+    @Value("${llm.gemini.api-key:}")
     private String geminiApiKey;
 
-    @Value("${gemini.model-name:gemini-2.5-flash-lite}")
+    @Value("${llm.gemini.model:gemini-2.5-flash-lite}")
     private String geminiModelName;
 
     @Value("${chatbot.memory.max-messages:12}")
@@ -42,36 +51,48 @@ public class ChatbotConfig {
 
     @Bean
     public ChatModel chatModel() {
-        if ("deepseek".equalsIgnoreCase(llmProvider)) {
-            return deepSeekChatModel();
-        }
-        if ("gemini".equalsIgnoreCase(llmProvider)) {
-            return geminiChatModel();
-        }
-        throw new IllegalArgumentException("Unsupported llm.provider: " + llmProvider);
+        return switch (normalizedProvider()) {
+            case "deepseek" -> deepSeekChatModel();
+            case "gemini" -> geminiChatModel();
+            default -> throw new IllegalArgumentException(
+                    "Unsupported llm.provider: " + llmProvider + ". Supported values: deepseek, gemini");
+        };
     }
 
     private ChatModel deepSeekChatModel() {
+        requireConfigured("LLM_DEEPSEEK_API_KEY", deepSeekApiKey);
         return OpenAiChatModel.builder()
-                .baseUrl(llmBaseUrl)
-                .apiKey(llmApiKey)
-                .modelName(llmModel)
-                .temperature(0.2)
-                .maxTokens(1024)
-                .timeout(Duration.ofSeconds(llmTimeoutSeconds))
+                .baseUrl(deepSeekBaseUrl)
+                .apiKey(deepSeekApiKey)
+                .modelName(deepSeekModel)
+                .temperature(temperature)
+                .maxTokens(maxOutputTokens)
+                .timeout(Duration.ofSeconds(timeoutSeconds))
                 .maxRetries(1)
                 .customParameters(Map.of("thinking", Map.of("type", "disabled")))
                 .build();
     }
 
     private ChatModel geminiChatModel() {
+        requireConfigured("GEMINI_API_KEY", geminiApiKey);
         return GoogleAiGeminiChatModel.builder()
                 .apiKey(geminiApiKey)
                 .modelName(geminiModelName)
-                .temperature(0.2)
-                .maxOutputTokens(1024)
-                .timeout(Duration.ofSeconds(llmTimeoutSeconds))
+                .temperature(temperature)
+                .maxOutputTokens(maxOutputTokens)
+                .timeout(Duration.ofSeconds(timeoutSeconds))
                 .build();
+    }
+
+    private String normalizedProvider() {
+        return llmProvider == null ? "" : llmProvider.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private void requireConfigured(String environmentVariable, String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException(
+                    environmentVariable + " must be configured when LLM_PROVIDER=" + normalizedProvider());
+        }
     }
 
     @Bean

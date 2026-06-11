@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
+@SpringBootTest(properties = "llm.deepseek.api-key=test-deepseek-key")
 class RagConfigTests {
 
     @Autowired
@@ -34,6 +34,30 @@ class RagConfigTests {
     void dynamicDataQuestionDoesNotAttachRagContext() {
         List<Content> content = contentRetriever.retrieve(
                 Query.from("Bệnh viện có những chuyên khoa nào?"));
+
+        assertTrue(content.isEmpty());
+    }
+
+    @Test
+    void unsupportedPriceQuestionDoesNotAttachUnrelatedPriceContext() {
+        List<Content> content = contentRetriever.retrieve(
+                Query.from("Giá khám tổng quát là bao nhiêu?"));
+
+        assertTrue(content.isEmpty());
+    }
+
+    @Test
+    void supportedPriceQuestionRetrievesExactFaqPrice() {
+        List<Content> content = contentRetriever.retrieve(
+                Query.from("Chi phí khám sức khỏe xin việc là bao nhiêu?"));
+
+        assertTrue(joinedText(content).contains("120.000 VNĐ"));
+    }
+
+    @Test
+    void unsupportedHospitalQuestionDoesNotAttachUnrelatedFaqContext() {
+        List<Content> content = contentRetriever.retrieve(
+                Query.from("Bệnh viện có khám tổng quát không?"));
 
         assertTrue(content.isEmpty());
     }

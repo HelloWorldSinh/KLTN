@@ -54,7 +54,7 @@ public class RagConfig {
             case FAQ -> faqRetriever.retrieve(query);
             case SYMPTOM -> specialtyRetriever.retrieve(
                     Query.from(intentRouter.specialtySearchText(query.text())));
-            case TOOL_LOOKUP, OUTSIDE_MEDICAL, GENERAL_MEDICAL -> List.of();
+            case TOOL_LOOKUP, UNSUPPORTED_HOSPITAL_INFO, OUTSIDE_MEDICAL, GENERAL_MEDICAL -> List.of();
         };
     }
 

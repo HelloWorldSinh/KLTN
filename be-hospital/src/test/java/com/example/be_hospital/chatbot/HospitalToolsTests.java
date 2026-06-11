@@ -48,12 +48,26 @@ class HospitalToolsTests {
         AccountResponse doctor = new AccountResponse(
                 9, "Bác sĩ A", "0900000000", "DOCTOR", "secret-password", 4, "CKI", LocalDate.of(2020, 1, 1));
         when(adminService.getAllAccounts()).thenReturn(List.of(doctor));
+        when(specialtyService.getAllSpecialties()).thenReturn(List.of(new SpecialtyDTO(4, "Nội khoa", null)));
 
         List<DoctorToolDto> result = hospitalTools.getDoctors();
 
-        assertEquals(new DoctorToolDto(9, "Bác sĩ A", 4, "CKI"), result.getFirst());
+        assertEquals(new DoctorToolDto(9, "Bác sĩ A", 4, "Nội khoa", "CKI"), result.getFirst());
         assertFalse(result.getFirst().toString().contains("secret-password"));
         assertFalse(result.getFirst().toString().contains("0900000000"));
+    }
+
+    @Test
+    void findsDoctorByNameWithoutRequiringAccentsOrDoctorPrefix() {
+        AccountResponse doctor = new AccountResponse(
+                9, "Bùi Quang Huy", "0900000000", "DOCTOR", "secret-password", 4, "CKI",
+                LocalDate.of(2020, 1, 1));
+        when(adminService.getAllAccounts()).thenReturn(List.of(doctor));
+        when(specialtyService.getAllSpecialties()).thenReturn(List.of(new SpecialtyDTO(4, "Nội khoa", null)));
+
+        List<DoctorToolDto> result = hospitalTools.findDoctorsByName("Bác sĩ Bui Quang Huy");
+
+        assertEquals(new DoctorToolDto(9, "Bùi Quang Huy", 4, "Nội khoa", "CKI"), result.getFirst());
     }
 
     @Test

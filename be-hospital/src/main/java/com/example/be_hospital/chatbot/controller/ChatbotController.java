@@ -14,6 +14,7 @@ import dev.langchain4j.exception.InternalServerException;
 import dev.langchain4j.exception.InvalidRequestException;
 import dev.langchain4j.exception.RateLimitException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/chatbot")
 @RequiredArgsConstructor
+@Slf4j
 public class ChatbotController {
 
     private final MedicalAssistant medicalAssistant;
@@ -60,16 +62,19 @@ public class ChatbotController {
                     "sessionId", sessionId,
                     "reply", botReply));
         } catch (RateLimitException exception) {
+            log.warn("Chatbot rate limited for session {}", sessionId, exception);
             removeFailedTurn(sessionId);
             return ResponseEntity.status(429).body(Map.of(
                     "sessionId", sessionId,
                     "reply", "Chatbot đang đạt giới hạn yêu cầu. Vui lòng chờ khoảng một phút rồi thử lại."));
         } catch (InternalServerException exception) {
+            log.error("Chatbot provider failed for session {}", sessionId, exception);
             removeFailedTurn(sessionId);
             return ResponseEntity.status(503).body(Map.of(
                     "sessionId", sessionId,
                     "reply", "Dịch vụ AI đang quá tải. Vui lòng thử lại sau ít phút."));
         } catch (InvalidRequestException exception) {
+            log.warn("Chatbot request invalid for session {}; retrying without history", sessionId, exception);
             chatMessageRepository.deleteBySessionId(sessionId);
             return retryWithoutHistory(sessionId, userMessage);
         }
@@ -105,16 +110,24 @@ public class ChatbotController {
                     "sessionId", sessionId,
                     "reply", botReply));
         } catch (RateLimitException exception) {
+            log.warn("Chatbot retry rate limited for session {}", sessionId, exception);
             removeFailedTurn(sessionId);
             return ResponseEntity.status(429).body(Map.of(
                     "sessionId", sessionId,
                     "reply", "Chatbot đang đạt giới hạn yêu cầu. Vui lòng chờ khoảng một phút rồi thử lại."));
         } catch (RuntimeException exception) {
+            log.error("Chatbot retry failed for session {} and message '{}'",
+                    sessionId, summarized(userMessage), exception);
             removeFailedTurn(sessionId);
             return ResponseEntity.status(503).body(Map.of(
                     "sessionId", sessionId,
                     "reply", "Chatbot không thể xử lý cuộc hội thoại hiện tại. Vui lòng thử lại sau."));
         }
+    }
+
+    private String summarized(String message) {
+        String normalized = message.replaceAll("\\s+", " ").trim();
+        return normalized.length() <= 120 ? normalized : normalized.substring(0, 120) + "...";
     }
 
     private void removeFailedTurn(String sessionId) {

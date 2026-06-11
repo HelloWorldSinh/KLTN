@@ -7,12 +7,16 @@ import com.example.be_hospital.chatbot.service.CurrentTimeProvider;
 import com.example.be_hospital.service.AdminService;
 import com.example.be_hospital.service.ScheduleService;
 import com.example.be_hospital.service.SpecialtyService;
+import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -31,12 +35,31 @@ public class HospitalTools {
                 .toList();
     }
 
-    @Tool("Danh sách bác sĩ: id, name, specialtyId, degree.")
+    @Tool("Danh sách bác sĩ: id, name, specialtyId, specialtyName, degree.")
     public List<DoctorToolDto> getDoctors() {
+        Map<Integer, String> specialtyNames = specialtyNames();
         return adminService.getAllAccounts().stream()
                 .filter(acc -> "DOCTOR".equalsIgnoreCase(acc.getRole()))
-                .map(acc -> new DoctorToolDto(acc.getId(), acc.getFullName(), acc.getSpecialtyId(), acc.getDegree()))
+                .map(acc -> toDoctorToolDto(acc, specialtyNames))
                 .collect(Collectors.toList());
+    }
+
+    @Tool("Tìm bác sĩ theo tên để biết id, specialtyId, specialtyName và degree. Trả danh sách rỗng nếu không tìm thấy.")
+    public List<DoctorToolDto> findDoctorsByName(@P("Họ tên bác sĩ cần tìm") String doctorName) {
+        String query = normalizedDoctorName(doctorName);
+        if (query.isBlank()) {
+            return List.of();
+        }
+
+        Map<Integer, String> specialtyNames = specialtyNames();
+        return adminService.getAllAccounts().stream()
+                .filter(acc -> "DOCTOR".equalsIgnoreCase(acc.getRole()))
+                .filter(acc -> {
+                    String candidate = normalizedDoctorName(acc.getFullName());
+                    return candidate.contains(query) || query.contains(candidate);
+                })
+                .map(acc -> toDoctorToolDto(acc, specialtyNames))
+                .toList();
     }
 
     @Tool("Lịch khám trống theo specialtyId, doctorId và dateString YYYY-MM-DD; tham số không dùng truyền null.")
@@ -58,5 +81,35 @@ public class HospitalTools {
                             Math.max(0, schedule.getSlot() - appointmentCount));
                 })
                 .toList();
+    }
+
+    private Map<Integer, String> specialtyNames() {
+        return specialtyService.getAllSpecialties().stream()
+                .collect(Collectors.toMap(item -> item.getId(), item -> item.getName(), (first, second) -> first));
+    }
+
+    private DoctorToolDto toDoctorToolDto(
+            com.example.be_hospital.dto.account.AccountResponse account,
+            Map<Integer, String> specialtyNames) {
+        return new DoctorToolDto(
+                account.getId(),
+                account.getFullName(),
+                account.getSpecialtyId(),
+                specialtyNames.get(account.getSpecialtyId()),
+                account.getDegree());
+    }
+
+    private String normalizedDoctorName(String name) {
+        if (name == null) {
+            return "";
+        }
+        return Normalizer.normalize(name, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replace('\u0111', 'd')
+                .replace('\u0110', 'D')
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", " ")
+                .replaceFirst("^bac si\\s+", "")
+                .trim();
     }
 }
