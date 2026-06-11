@@ -14,6 +14,7 @@ public class PatientQueueResponse {
     private int totalInQueue;        // Tổng số BN đang chờ
     private String myStatus;         // Status gốc: WAITING, IN_PROGRESS...
     private String myDisplayStatus;  // "Đang khám", "Chuẩn bị", "Chờ khám"
+    private Integer myQueueOrder;    // Số thứ tự khám gốc được cấp
 
     // === Thông tin lịch khám ===
     private int appointmentId;       // ID lịch hẹn của BN

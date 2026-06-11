@@ -12,4 +12,6 @@ public class QueueItemDTO {
     private String status;       // Trạng thái gốc: WAITING, IN_PROGRESS, MISSED...
 
     private String displayStatus; // Trạng thái hiển thị: "Đang khám", "Chuẩn bị", "Chờ khám", "Vắng mặt"
+
+    private Integer queueOrder;   // Số thứ tự gốc của bệnh nhân
 }

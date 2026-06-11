@@ -28,5 +28,7 @@ public class DoctorQueueResponse {
         private int queuePosition;
         private String status;
         private String displayStatus;
+        private java.time.LocalDateTime absentAt;
+        private Integer queueOrder;
     }
 }

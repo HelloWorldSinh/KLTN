@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { 
   Activity, LogIn, ChevronDown, Settings, Key, LogOut, Menu, X, LayoutDashboard,
-  Calendar, Users, Package, Stethoscope, Clock, ShieldAlert, UserCircle, Bell
+  Calendar, Users, Package, Clock, ShieldAlert, UserCircle, Bell
 } from 'lucide-react';
 import { notificationService, type NotificationDTO } from '../services/notification.service';
 
@@ -146,7 +146,6 @@ export const Header = () => {
         return [
           { name: 'Lịch của tôi', href: '/doctor/schedule', icon: Calendar },
           { name: 'Danh sách bệnh nhân', href: '/doctor/patients', icon: Users },
-          { name: 'Chẩn đoán & Đơn thuốc', href: '/doctor/diagnosis', icon: Stethoscope },
           { name: 'Hồ sơ cá nhân', href: '/profile', icon: UserCircle },
         ];
       case 'STAFF':

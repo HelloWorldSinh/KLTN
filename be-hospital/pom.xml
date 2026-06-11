@@ -102,6 +102,11 @@
 			<artifactId>langchain4j-google-ai-gemini-spring-boot4-starter</artifactId>
 			<version>1.13.1-beta23</version>
 		</dependency>
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-open-ai</artifactId>
+			<version>1.13.1</version>
+		</dependency>
 		<!-- Embedding model chạy local, không cần API key -->
 		<dependency>
 			<groupId>dev.langchain4j</groupId>

@@ -125,6 +125,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         dto.setStatus(appointment.getStatus());
         dto.setCancelReason(appointment.getCancelReason());
         dto.setCreatedAt(appointment.getCreatedAt());
+        dto.setQueueOrder(appointment.getQueueOrder());
 
         userRepository.findById(appointment.getPatientId()).ifPresent(patient -> {
             dto.setPatientName(patient.getFullName());
@@ -151,6 +152,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         dto.setStatus(appointment.getStatus());
         dto.setCancelReason(appointment.getCancelReason());
         dto.setCreatedAt(appointment.getCreatedAt());
+        dto.setQueueOrder(appointment.getQueueOrder());
 
         scheduleRepository.findById(appointment.getScheduleId()).ifPresent(schedule -> {
             dto.setDoctorId(schedule.getDoctorId());

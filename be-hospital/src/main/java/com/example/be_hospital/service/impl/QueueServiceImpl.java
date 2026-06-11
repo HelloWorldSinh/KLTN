@@ -108,6 +108,7 @@ public class QueueServiceImpl implements QueueService {
             item.setQueuePosition(position);
             item.setStatus(app.getStatus().name());
             item.setDisplayStatus(getDisplayStatus(app.getStatus(), i, hasInProgress));
+            item.setQueueOrder(app.getQueueOrder());
 
             queueList.add(item);
 
@@ -116,6 +117,7 @@ public class QueueServiceImpl implements QueueService {
                 response.setMyPosition(position);
                 response.setMyStatus(app.getStatus().name());
                 response.setMyDisplayStatus(item.getDisplayStatus());
+                response.setMyQueueOrder(app.getQueueOrder());
             }
         }
 
@@ -132,14 +134,18 @@ public class QueueServiceImpl implements QueueService {
     public DoctorQueueResponse getDoctorQueue(String phone, int scheduleId) {
         DoctorQueueResponse response = new DoctorQueueResponse();
 
-        // Validate: BS phải sở hữu schedule này
-        User doctor = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy bác sĩ"));
+        // Validate: BS phải sở hữu schedule này, còn STAFF thì được quyền xem toàn bộ
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch khám"));
 
-        if (schedule.getDoctorId() != doctor.getId()) {
+        if ("ROLE_DOCTOR".equals(user.getRole())) {
+            if (schedule.getDoctorId() != user.getId()) {
+                throw new RuntimeException("Bạn không có quyền xem hàng đợi này");
+            }
+        } else if (!"ROLE_STAFF".equals(user.getRole())) {
             throw new RuntimeException("Bạn không có quyền xem hàng đợi này");
         }
 
@@ -171,6 +177,8 @@ public class QueueServiceImpl implements QueueService {
             item.setQueuePosition(position);
             item.setStatus(app.getStatus().name());
             item.setDisplayStatus(getDisplayStatus(app.getStatus(), i, hasInProgress));
+            item.setAbsentAt(app.getAbsentAt());
+            item.setQueueOrder(app.getQueueOrder());
 
             // Lấy tên bệnh nhân (BS được phép thấy)
             userRepository.findById(app.getPatientId())
@@ -294,8 +302,12 @@ public class QueueServiceImpl implements QueueService {
     @Override
     @Transactional
     public ResponseObject recallPatient(int appointmentId, String doctorPhone) {
-        User doctor = userRepository.findByPhone(doctorPhone)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy bác sĩ"));
+        User staff = userRepository.findByPhone(doctorPhone)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên tiếp đón"));
+
+        if (!"ROLE_STAFF".equals(staff.getRole())) {
+            return new ResponseObject(false, "Chỉ có Điều dưỡng mới được quyền thực hiện chức năng này");
+        }
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch hẹn"));
@@ -303,30 +315,16 @@ public class QueueServiceImpl implements QueueService {
         Schedule schedule = scheduleRepository.findById(appointment.getScheduleId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch khám"));
 
-        if (schedule.getDoctorId() != doctor.getId()) {
-            return new ResponseObject(false, "Bạn không có quyền thao tác");
-        }
-
         // Chỉ BN đang MISSED mới được gọi lại
         if (appointment.getStatus() != AppointmentStatus.MISSED) {
             return new ResponseObject(false, "Chỉ có thể gọi lại bệnh nhân đang ở trạng thái vắng mặt");
         }
 
         // Kiểm tra quy tắc 30 phút vắng mặt
-        if (appointment.getAbsentAt() != null && 
-            Duration.between(appointment.getAbsentAt(), LocalDateTime.now()).toMinutes() > 30) {
-            
-            // Quá hạn 30 phút: Đẩy xuống cuối hàng đợi
-            int maxOrder = appointmentRepository.findMaxQueueOrderByScheduleId(schedule.getId());
-            appointment.setQueueOrder(maxOrder + 1);
-            appointment.setStatus(AppointmentStatus.WAITING);
-            appointment.setAbsentAt(null); // Reset thời gian vắng mặt
-            appointmentRepository.save(appointment);
+        if (appointment.getAbsentAt() != null &&
+                Duration.between(appointment.getAbsentAt(), LocalDateTime.now()).toMinutes() > 30) {
 
-            // Phát sự kiện SSE cập nhật hàng đợi thời gian thực
-            sseService.broadcastQueueUpdate(schedule.getId());
-
-            return new ResponseObject(true, "Bệnh nhân vắng mặt quá 30 phút. Đã chuyển xuống cuối hàng đợi.");
+            return new ResponseObject(false, "Đã quá thời gian ưu tiên 30 phút. Không thể gọi lại bệnh nhân này.");
         }
 
         // Trong thời hạn 30 phút: Chèn vào vị trí thứ 3 trong danh sách chờ

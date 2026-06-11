@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
-import { chatWithBot } from '../services/chatbot.service';
+import { chatWithBot, getChatHistory } from '../services/chatbot.service';
 
 const SUGGESTED_QUESTIONS = [
   'Hướng dẫn đặt lịch khám bệnh',
@@ -14,8 +14,8 @@ const Chatbot = () => {
     { sender: 'bot', text: 'Xin chào! Tôi là trợ lý AI của bệnh viện. Tôi có thể giúp gì cho bạn hôm nay?' }
   ]);
   const [input, setInput] = useState('');
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatbotRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +34,29 @@ const Chatbot = () => {
       sessionStorage.removeItem('justLoggedIn');
     }
   }, []);
+
+  // Fetch history when opening for the first time
+  useEffect(() => {
+    if (isOpen && !hasLoadedHistory) {
+      const fetchHistory = async () => {
+        try {
+          const history = await getChatHistory();
+          if (history && history.length > 0) {
+            const formattedHistory = history.map(msg => ({
+              sender: msg.role === 'USER' ? 'user' : ('bot' as 'user' | 'bot'),
+              text: msg.text
+            }));
+            setMessages(formattedHistory);
+          }
+        } catch (error) {
+          console.error("Lỗi khi lấy lịch sử chat:", error);
+        } finally {
+          setHasLoadedHistory(true);
+        }
+      };
+      fetchHistory();
+    }
+  }, [isOpen, hasLoadedHistory]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,14 +77,14 @@ const Chatbot = () => {
     setIsLoading(true);
 
     try {
-      const response = await chatWithBot(text, sessionId);
-      if (response.sessionId) {
-        setSessionId(response.sessionId);
-      }
+      const response = await chatWithBot(text);
       setMessages(prev => [...prev, { sender: 'bot', text: response.reply }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Lỗi khi kết nối với chatbot:", error);
-      setMessages(prev => [...prev, { sender: 'bot', text: 'Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau.' }]);
+      const errorMessage = error.response?.data?.reply
+        || error.response?.data?.error
+        || 'Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau.';
+      setMessages(prev => [...prev, { sender: 'bot', text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }

@@ -43,8 +43,7 @@ public class AppointmentScheduler {
             AppointmentStatus.CONFIRMED,
             AppointmentStatus.WAITING,
             AppointmentStatus.IN_PROGRESS,
-            AppointmentStatus.MISSED
-    );
+            AppointmentStatus.MISSED);
 
     // Chạy định kỳ lúc 12:00 và 20:00 hàng ngày
     @Scheduled(cron = "0 0 12,20 * * ?")
@@ -67,8 +66,7 @@ public class AppointmentScheduler {
         LocalTime now = LocalTime.now();
 
         List<Appointment> expiredAppointments = appointmentRepository.findExpiredAppointments(
-                today, now, ACTIVE_STATUSES
-        );
+                today, now, ACTIVE_STATUSES);
 
         if (expiredAppointments.isEmpty()) {
             log.info("No expired appointments found.");
@@ -81,28 +79,31 @@ public class AppointmentScheduler {
             appointment.setStatus(AppointmentStatus.NO_SHOW);
             appointment.setCancelReason("Hệ thống tự động hủy do bệnh nhân không đến khám đúng ca hẹn");
             appointmentRepository.save(appointment);
-            log.info("Updated appointment ID {} (Patient ID {}) to NO_SHOW", appointment.getId(), appointment.getPatientId());
+            log.info("Updated appointment ID {} (Patient ID {}) to NO_SHOW", appointment.getId(),
+                    appointment.getPatientId());
 
             // Tạo thông báo cho bệnh nhân
             scheduleRepository.findById(appointment.getScheduleId()).ifPresent(schedule -> {
                 Notification notification = new Notification();
                 notification.setUserId(appointment.getPatientId());
                 notification.setTitle("Lịch hẹn khám bệnh bị hủy tự động");
-                notification.setContent("Lịch hẹn của bạn vào ca " + schedule.getStartTime().toString().substring(0, 5) + 
-                    " - " + schedule.getEndTime().toString().substring(0, 5) + " ngày " + schedule.getWorkDate() +
-                    " tại phòng " + schedule.getRoom() + " đã bị hệ thống tự động hủy do bạn không đến khám đúng hẹn.");
+                notification.setContent("Lịch hẹn của bạn vào ca " + schedule.getStartTime().toString().substring(0, 5)
+                        +
+                        " - " + schedule.getEndTime().toString().substring(0, 5) + " ngày " + schedule.getWorkDate() +
+                        " tại phòng " + schedule.getRoom()
+                        + " đã bị hệ thống tự động hủy do bạn không đến khám đúng hẹn.");
                 notification.setRead(false);
                 notificationRepository.save(notification);
 
                 // Gửi thông báo real-time qua SSE đến bệnh nhân
                 try {
                     sseService.sendNotification(
-                        appointment.getPatientId(),
-                        notification.getTitle(),
-                        notification.getContent()
-                    );
+                            appointment.getPatientId(),
+                            notification.getTitle(),
+                            notification.getContent());
                 } catch (Exception e) {
-                    log.error("Failed to send SSE notification to patient ID {}: {}", appointment.getPatientId(), e.getMessage());
+                    log.error("Failed to send SSE notification to patient ID {}: {}", appointment.getPatientId(),
+                            e.getMessage());
                 }
             });
         }

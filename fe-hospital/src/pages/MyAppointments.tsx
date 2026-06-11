@@ -167,7 +167,14 @@ export const MyAppointments = () => {
             <div key={app.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow overflow-hidden group">
               <div className="p-6 border-b border-gray-50 flex justify-between items-start">
                 <div>
-                  <AppointmentStatusBadge status={app.status} />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <AppointmentStatusBadge status={app.status} />
+                    {(app.status === 'PENDING' || app.status === 'CONFIRMED') && app.queueOrder !== undefined && (
+                      <span className="flex items-center gap-1.5 px-3 py-1 bg-teal-50 rounded-full text-teal-600 font-bold border border-teal-200/50 text-xs">
+                        Số thứ tự: {app.queueOrder}
+                      </span>
+                    )}
+                  </div>
                   <h3 className="text-xl font-bold text-gray-900 mt-3 mb-1">BS. {app.doctorName}</h3>
                   <p className="text-gray-500 text-sm font-medium">{app.specialtyName}</p>
                   {(app.status === 'CANCELLED' || app.status === 'NO_SHOW' || app.status === 'SYSTEM_CANCELLED') && app.cancelReason && (

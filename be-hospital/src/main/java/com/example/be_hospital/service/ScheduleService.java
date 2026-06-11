@@ -25,4 +25,6 @@ public interface ScheduleService {
     ResponseObject approveCancelSchedule(int id);
 
     ResponseObject rejectCancelSchedule(int id, String reason);
+
+    List<ScheduleDTO> getTodaySchedules();
 }

@@ -48,9 +48,9 @@ public class QueueController {
         return ResponseEntity.ok(queueService.getPatientQueue(principal.getName()));
     }
 
-    // Bác sĩ xem hàng đợi của một ca khám (schedule)
+    // Bác sĩ/Điều dưỡng xem hàng đợi của một ca khám (schedule)
     @GetMapping("/doctor/{scheduleId}")
-    @PreAuthorize("hasRole('DOCTOR')")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'STAFF')")
     public ResponseEntity<DoctorQueueResponse> getDoctorQueue(@PathVariable int scheduleId, Principal principal) {
         return ResponseEntity.ok(queueService.getDoctorQueue(principal.getName(), scheduleId));
     }
@@ -69,9 +69,9 @@ public class QueueController {
         return ResponseEntity.ok(queueService.markAbsent(appointmentId, principal.getName()));
     }
 
-    // Bác sĩ nhấn nút "Gọi lại" (cho bệnh nhân vắng mặt)
+    // Điều dưỡng nhấn nút "Gọi lại" (cho bệnh nhân vắng mặt)
     @PutMapping("/{appointmentId}/recall")
-    @PreAuthorize("hasRole('DOCTOR')")
+    @PreAuthorize("hasRole('STAFF')")
     public ResponseEntity<ResponseObject> recallPatient(@PathVariable int appointmentId, Principal principal) {
         return ResponseEntity.ok(queueService.recallPatient(appointmentId, principal.getName()));
     }

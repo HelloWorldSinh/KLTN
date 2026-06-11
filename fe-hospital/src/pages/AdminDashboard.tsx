@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Users, Stethoscope, ShieldAlert, Activity, Package, Calendar, 
-  Clock, AlertCircle, CheckCircle, XCircle, ChevronRight, TrendingUp, HelpCircle
+  Clock, AlertCircle, ChevronRight, TrendingUp
 } from 'lucide-react';
 import { adminService, type DashboardStatsResponse } from '../services/admin.service';
 

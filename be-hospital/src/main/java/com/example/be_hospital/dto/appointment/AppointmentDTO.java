@@ -21,4 +21,5 @@ public class AppointmentDTO {
     private AppointmentStatus status;
     private String cancelReason;
     private LocalDateTime createdAt;
+    private Integer queueOrder;
 }

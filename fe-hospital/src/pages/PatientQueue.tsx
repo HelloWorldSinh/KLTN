@@ -143,29 +143,44 @@ export const PatientQueue = () => {
 
       {/* Thẻ trạng thái chính */}
       <div className={`${style.bg} ${style.border} border-2 rounded-3xl p-8 shadow-sm`}>
-        <div className="flex items-center gap-6">
-          <div className="flex-shrink-0">
-            {style.icon}
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">Trạng thái của bạn</p>
-            <h2 className={`text-3xl font-black ${style.text}`}>
-              {data.myDisplayStatus}
-            </h2>
-          </div>
-          <div className="text-right">
-            <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">Vị trí</p>
-            <div className={`text-5xl font-black ${style.text}`}>
-              {data.myPosition}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+          {/* Trạng thái hiển thị */}
+          <div className="flex items-center gap-4">
+            <div className="flex-shrink-0">
+              {style.icon}
             </div>
-            <p className="text-xs text-gray-400 font-medium mt-1">/ {data.totalInQueue} người</p>
+            <div>
+              <p className="text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-1">Trạng thái khám</p>
+              <h2 className={`text-2xl font-black ${style.text}`}>
+                {data.myDisplayStatus}
+              </h2>
+            </div>
+          </div>
+
+          {/* Số thứ tự khám của bạn (To rõ ràng để dễ nhìn) */}
+          <div className="flex flex-col items-center md:items-center text-center justify-center border-y md:border-y-0 md:border-x border-gray-200/50 py-4 md:py-0">
+            <p className="text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-1">Số thứ tự của bạn</p>
+            <div className="text-7xl font-black text-primary tracking-tight leading-none">
+              {data.myQueueOrder !== undefined ? String(data.myQueueOrder).padStart(2, '0') : '--'}
+            </div>
+          </div>
+
+          {/* Vị trí chờ hiện tại */}
+          <div className="text-center md:text-right flex flex-col justify-center">
+            <p className="text-xs font-extrabold text-gray-400 uppercase tracking-wider mb-1">Vị trí trong hàng chờ</p>
+            <div className={`text-4xl font-black ${style.text} leading-none`}>
+              {data.myPosition > 0 ? `${data.myPosition} / ${data.totalInQueue}` : '--'}
+            </div>
+            <p className="text-xs text-gray-400 font-bold mt-1.5">
+              {data.myPosition > 0 ? `Còn ${data.myPosition - 1} người phía trước` : 'Không ở trong hàng đợi'}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Thông tin ca khám */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Thông tin lịch khám</h3>
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-150">
+        <h3 className="text-xs font-bold text-gray-450 uppercase tracking-wider mb-4">Thông tin lịch khám</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
@@ -198,7 +213,7 @@ export const PatientQueue = () => {
       </div>
 
       {/* Danh sách hàng đợi */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-150 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <h3 className="font-bold text-gray-800 flex items-center gap-2">
             <Users className="w-5 h-5 text-primary" />
@@ -227,15 +242,16 @@ export const PatientQueue = () => {
                       ? 'bg-primary text-white'
                       : 'bg-gray-100 text-gray-500'
                 }`}>
-                  {item.queuePosition}
+                  {item.queueOrder !== undefined ? String(item.queueOrder).padStart(2, '0') : item.queuePosition}
                 </div>
 
                 {/* Nhãn */}
                 <div className="flex-1">
                   <p className={`font-bold ${isMe ? 'text-primary' : 'text-gray-700'}`}>
-                    Số thứ tự {item.queuePosition}
+                    Số thứ tự {item.queueOrder !== undefined ? String(item.queueOrder).padStart(2, '0') : item.queuePosition}
                     {isMe && <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">Bạn</span>}
                   </p>
+                  <p className="text-[10px] text-gray-400 font-bold mt-0.5">Vị trí hàng chờ: {item.queuePosition}</p>
                 </div>
 
                 {/* Trạng thái */}

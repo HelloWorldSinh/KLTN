@@ -238,6 +238,14 @@ export const PatientDashboard = () => {
                       <MapPin className="w-4 h-4 text-emerald-500 shrink-0" />
                       <span className="font-bold text-slate-700">Phòng: {nextAppointment.room}</span>
                     </div>
+                    {nextAppointment.queueOrder !== undefined && (
+                      <div className="flex items-center gap-3">
+                        <Users className="w-4 h-4 text-teal-500 shrink-0" />
+                        <span className="font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded text-xs border border-teal-200/40">
+                          Số thứ tự của bạn: {nextAppointment.queueOrder}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="pt-4 flex gap-3">

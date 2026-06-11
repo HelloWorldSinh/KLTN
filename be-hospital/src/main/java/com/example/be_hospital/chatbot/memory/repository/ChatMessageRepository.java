@@ -16,6 +16,8 @@ import java.util.List;
 public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, Long> {
     List<ChatMessageEntity> findBySessionIdOrderByIdAsc(String sessionId);
 
+    List<ChatMessageEntity> findTop10BySessionIdOrderByIdDesc(String sessionId);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM ChatMessageEntity c WHERE c.sessionId = :sessionId")

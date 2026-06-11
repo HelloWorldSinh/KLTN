@@ -5,11 +5,19 @@ interface ChatResponse {
   reply: string;
 }
 
-export const chatWithBot = async (message: string, sessionId?: string | null): Promise<ChatResponse> => {
+export interface ChatMessage {
+  role: 'USER' | 'AI';
+  text: string;
+}
+
+export const chatWithBot = async (message: string): Promise<ChatResponse> => {
   const response = await api.post('/api/chatbot/chat', {
-    message,
-    sessionId: sessionId || "",
+    message
   });
   return response.data;
 };
 
+export const getChatHistory = async (): Promise<ChatMessage[]> => {
+  const response = await api.get('/api/chatbot/history');
+  return response.data;
+};

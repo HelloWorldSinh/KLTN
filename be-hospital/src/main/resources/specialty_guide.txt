@@ -1,0 +1,40 @@
+[GLOBAL_RULES]
+1. Nếu bệnh nhân dưới 16 tuổi: Luôn ưu tiên đề xuất NHI KHOA (ID: 6). Trừ trường hợp có dấu hiệu cấp cứu nguy hiểm.
+2. Dấu hiệu nguy hiểm cấp cứu: đau ngực dữ dội, khó thở nặng, mất ý thức, co giật kéo dài, chảy máu ồ ạt, tím tái, đau bụng cấp dữ dội, sốt cao co giật. => Khuyên bệnh nhân: Gọi cấp cứu 115 HOẶC đến phòng cấp cứu gần nhất ngay lập tức.
+3. Nếu triệu chứng không rõ ràng: Từ 16 tuổi trở lên đề xuất NỘI KHOA (ID: 4). Dưới 16 tuổi đề xuất NHI KHOA (ID: 6).
+4. Khi trả lời: Luôn giải thích ngắn gọn lý do đề xuất, không chẩn đoán bệnh chắc chắn, chỉ tư vấn ban đầu.
+
+==================================================
+[SPECIALTY: NỘI KHOA - ID: 4]
+Đối tượng: Người lớn từ 16 tuổi trở lên.
+Phạm vi: Khám và điều trị các bệnh lý nội tạng bằng phương pháp nội khoa (dùng thuốc, không phẫu thuật).
+Triệu chứng của khoa NỘI KHOA bao gồm: đau đầu kéo dài, chóng mặt, hoa mắt, mất ngủ mạn tính, tăng huyết áp, đau tức ngực, khó thở khi gắng sức, hồi hộp đánh trống ngực, đau bụng mạn tính, ợ hơi, ợ chua, khó tiêu, buồn nôn, rối loạn tiêu hóa, đau nhức xương khớp, tê bì chân tay, sốt kéo dài không rõ nguyên nhân, mệt mỏi sụt cân bất thường, tiểu đường, rối loạn mỡ máu, bệnh tuyến giáp, ho kéo dài, khó thở, hen phế quản ở người lớn.
+Quy tắc: Nếu bệnh nhân từ 16 tuổi trở lên và có các triệu chứng NỘI KHOA hoặc triệu chứng chưa rõ nguyên nhân, đề xuất khám NỘI KHOA (ID: 4).
+
+==================================================
+[SPECIALTY: NGOẠI KHOA - ID: 5]
+Đối tượng: Mọi lứa tuổi.
+Phạm vi: Khám và điều trị các bệnh lý cần can thiệp ngoại khoa hoặc phẫu thuật.
+Triệu chứng của khoa NGOẠI KHOA bao gồm: gãy xương, trật khớp, vết thương hở sâu, bầm tím sưng to, đau bụng cấp dữ dội, nghi viêm ruột thừa, đau bụng kèm nôn mửa, bụng chướng cứng, khối u, bướu, hạch sưng to, thoát vị bẹn, trĩ, đau rát khi đi cầu, chảy máu khi đi cầu, sỏi thận, sỏi niệu quản, đau quặn thắt lưng, tiểu buốt, tiểu ra máu, áp xe, nhọt mưng mủ.
+Quy tắc: Nếu bệnh nhân có chấn thương, bệnh lý cần phẫu thuật hoặc triệu chứng NGOẠI KHOA cấp tính, đề xuất khám NGOẠI KHOA (ID: 5).
+
+==================================================
+[SPECIALTY: NHI KHOA - ID: 6]
+Đối tượng: Trẻ em dưới 16 tuổi.
+Phạm vi: Khám và chăm sóc sức khỏe cho trẻ em từ sơ sinh đến dưới 16 tuổi.
+Triệu chứng của khoa NHI KHOA bao gồm: trẻ sốt cao, sốt kéo dài, co giật do sốt, trẻ ho, sổ mũi, khò khè, khó thở ở trẻ, viêm phế quản, viêm phổi, trẻ tiêu chảy, nôn ói, đau bụng ở trẻ, biếng ăn, chậm tăng cân, phát ban, nổi mẩn đỏ, sởi, tay chân miệng, quấy khóc bất thường, bỏ bú, li bì, ngủ nhiều bất thường, tiêm chủng, tư vấn dinh dưỡng trẻ em.
+Quy tắc: Nếu bệnh nhân dưới 16 tuổi, ưu tiên đề xuất NHI KHOA (ID: 6) trước các chuyên khoa khác.
+
+==================================================
+[SPECIALTY: SẢN PHỤ KHOA - ID: 7]
+Đối tượng: Nữ giới từ tuổi dậy thì trở lên.
+Phạm vi: Khám và điều trị các vấn đề sức khỏe phụ nữ, thai sản và phụ khoa.
+Triệu chứng của khoa SẢN PHỤ KHOA bao gồm: chậm kinh, nghi ngờ có thai, khám thai, theo dõi thai kỳ, đau bụng dưới ở nữ, rối loạn kinh nguyệt, rong kinh, mất kinh, khí hư bất thường, khí hư có mùi hôi, ngứa rát vùng kín, đau khi quan hệ, xuất huyết bất thường, tầm soát ung thư cổ tử cung, u xơ tử cung, u nang buồng trứng, kế hoạch hóa gia đình, vô sinh hiếm muộn.
+Quy tắc: Nếu bệnh nhân là nữ giới và có triệu chứng SẢN PHỤ KHOA hoặc thai sản, đề xuất khám SẢN PHỤ KHOA (ID: 7).
+
+==================================================
+[SPECIALTY: TAI MŨI HỌNG - ID: 8]
+Đối tượng: Mọi lứa tuổi.
+Phạm vi: Khám và điều trị các bệnh lý liên quan đến tai, mũi, họng và vùng đầu cổ.
+Triệu chứng của khoa TAI MŨI HỌNG bao gồm: đau tai, chảy mủ tai, ù tai, nghe kém, điếc đột ngột, ngạt mũi, chảy nước mũi kéo dài, hắt hơi liên tục, viêm xoang, đau nhức vùng trán, đau họng, khản tiếng, nuốt vướng, nuốt đau, viêm amidan tái phát, chảy máu cam, ho khan kéo dài, cảm giác có đờm trong họng, dị vật trong họng, ngáy to, ngưng thở khi ngủ.
+Quy tắc: Nếu bệnh nhân có triệu chứng liên quan đến tai, mũi hoặc họng, đề xuất khám TAI MŨI HỌNG (ID: 8).

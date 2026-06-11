@@ -1,8 +1,9 @@
 package com.example.be_hospital.chatbot.tools;
 
-import com.example.be_hospital.dto.account.AccountResponse;
-import com.example.be_hospital.dto.schedule.ScheduleDTO;
-import com.example.be_hospital.dto.specialty.SpecialtyDTO;
+import com.example.be_hospital.chatbot.dto.DoctorToolDto;
+import com.example.be_hospital.chatbot.dto.ScheduleToolDto;
+import com.example.be_hospital.chatbot.dto.SpecialtyToolDto;
+import com.example.be_hospital.chatbot.service.CurrentTimeProvider;
 import com.example.be_hospital.service.AdminService;
 import com.example.be_hospital.service.ScheduleService;
 import com.example.be_hospital.service.SpecialtyService;
@@ -21,23 +22,41 @@ public class HospitalTools {
     private final SpecialtyService specialtyService;
     private final AdminService adminService;
     private final ScheduleService scheduleService;
+    private final CurrentTimeProvider currentTimeProvider;
 
-    @Tool("Lấy danh sách tất cả các chuyên khoa hiện có của bệnh viện/phòng khám.")
-    public List<SpecialtyDTO> getSpecialties() {
-        return specialtyService.getAllSpecialties();
+    @Tool("Danh sách chuyên khoa: id, name.")
+    public List<SpecialtyToolDto> getSpecialties() {
+        return specialtyService.getAllSpecialties().stream()
+                .map(item -> new SpecialtyToolDto(item.getId(), item.getName()))
+                .toList();
     }
 
-    @Tool("Lấy danh sách thông tin các bác sĩ, bao gồm ID bác sĩ (id), tên bác sĩ (fullName), chuyên khoa (specialtyId) và bằng cấp (degree).")
-    public List<AccountResponse> getDoctors() {
-        // Lọc ra các account có role là DOCTOR
+    @Tool("Danh sách bác sĩ: id, name, specialtyId, degree.")
+    public List<DoctorToolDto> getDoctors() {
         return adminService.getAllAccounts().stream()
                 .filter(acc -> "DOCTOR".equalsIgnoreCase(acc.getRole()))
+                .map(acc -> new DoctorToolDto(acc.getId(), acc.getFullName(), acc.getSpecialtyId(), acc.getDegree()))
                 .collect(Collectors.toList());
     }
 
-    @Tool("Tra cứu lịch khám trống của một bác sĩ hoặc chuyên khoa. Cần truyền vào ID chuyên khoa (specialtyId), ID bác sĩ (doctorId), và ngày muốn khám (date định dạng YYYY-MM-DD). Nếu không biết chính xác, hãy truyền null.")
-    public List<ScheduleDTO> getAvailableSchedules(Integer specialtyId, Integer doctorId, String dateString) {
-        LocalDate date = (dateString != null && !dateString.isEmpty()) ? LocalDate.parse(dateString) : LocalDate.now();
-        return scheduleService.getAvailableSchedules(specialtyId, doctorId, date);
+    @Tool("Lịch khám trống theo specialtyId, doctorId và dateString YYYY-MM-DD; tham số không dùng truyền null.")
+    public List<ScheduleToolDto> getAvailableSchedules(Integer specialtyId, Integer doctorId, String dateString) {
+        LocalDate date = (dateString != null && !dateString.isEmpty())
+                ? LocalDate.parse(dateString)
+                : currentTimeProvider.currentDate();
+        return scheduleService.getAvailableSchedules(specialtyId, doctorId, date).stream()
+                .limit(30)
+                .map(schedule -> {
+                    int appointmentCount = schedule.getAppointmentCount() == null ? 0 : schedule.getAppointmentCount();
+                    return new ScheduleToolDto(
+                            schedule.getDoctorId(),
+                            schedule.getDoctorName(),
+                            schedule.getWorkDate(),
+                            schedule.getStartTime(),
+                            schedule.getEndTime(),
+                            schedule.getRoom(),
+                            Math.max(0, schedule.getSlot() - appointmentCount));
+                })
+                .toList();
     }
 }

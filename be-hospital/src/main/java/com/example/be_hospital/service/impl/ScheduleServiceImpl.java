@@ -115,7 +115,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         // Overlap check for the updated time (excluding self)
         List<Schedule> conflicts = scheduleRepository.findOverlappingSchedules(
                 dto.getDoctorId(), dto.getWorkDate(), dto.getStartTime(), dto.getEndTime());
-        
+
         boolean hasRealConflict = conflicts.stream().anyMatch(s -> s.getId() != id);
         if (hasRealConflict) {
             return new ResponseObject(false, "Xung đột lịch làm việc khác của bác sĩ");
@@ -155,17 +155,25 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<ScheduleDTO> getAvailableSchedules(Integer specialtyId, Integer doctorId, LocalDate date) {
         return scheduleRepository.findAllByOrderByWorkDateDesc().stream()
                 .filter(s -> {
-                    if (date != null && !s.getWorkDate().equals(date)) return false;
-                    if (doctorId != null && s.getDoctorId() != doctorId) return false;
-                    if (s.getWorkDate().isBefore(LocalDate.now())) return false;
-                    if (s.getStatus() != null && !"ACTIVE".equals(s.getStatus()) && !"REJECTED_CANCEL".equals(s.getStatus())) return false;
+                    if (date != null && !s.getWorkDate().equals(date))
+                        return false;
+                    if (doctorId != null && s.getDoctorId() != doctorId)
+                        return false;
+                    if (s.getWorkDate().isBefore(LocalDate.now()))
+                        return false;
+                    if (s.getStatus() != null && !"ACTIVE".equals(s.getStatus())
+                            && !"REJECTED_CANCEL".equals(s.getStatus()))
+                        return false;
                     if (specialtyId != null) {
-                        com.example.be_hospital.entity.DoctorProfile profile = 
-                            doctorProfileRepository.findById(s.getDoctorId()).orElse(null);
-                        if (profile == null || profile.getSpecialtyId() != specialtyId) return false;
+                        com.example.be_hospital.entity.DoctorProfile profile = doctorProfileRepository
+                                .findById(s.getDoctorId()).orElse(null);
+                        if (profile == null || profile.getSpecialtyId() != specialtyId)
+                            return false;
                     }
-                    int activeCount = appointmentRepository.countByScheduleIdAndStatusNot(s.getId(), com.example.be_hospital.entity.AppointmentStatus.CANCELLED);
-                    if (activeCount >= s.getSlot()) return false;
+                    int activeCount = appointmentRepository.countByScheduleIdAndStatusNot(s.getId(),
+                            com.example.be_hospital.entity.AppointmentStatus.CANCELLED);
+                    if (activeCount >= s.getSlot())
+                        return false;
                     return true;
                 })
                 .map(this::mapToDTO)
@@ -212,7 +220,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleRepository.save(schedule);
 
         // Ghi nhận lý do hủy vào lịch sử (Log)
-        log.info("Bác sĩ yêu cầu hủy lịch làm việc. ID lịch: {}, Ngày trực: {}, Lý do: {}", 
+        log.info("Bác sĩ yêu cầu hủy lịch làm việc. ID lịch: {}, Ngày trực: {}, Lý do: {}",
                 id, schedule.getWorkDate(), reason);
 
         return new ResponseObject(true, "Đã gửi yêu cầu, chờ phê duyệt");
@@ -237,8 +245,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<Appointment> appointments = appointmentRepository.findByScheduleId(id);
         for (Appointment app : appointments) {
             if (app.getStatus() != AppointmentStatus.CANCELLED &&
-                app.getStatus() != AppointmentStatus.COMPLETED) {
-                
+                    app.getStatus() != AppointmentStatus.COMPLETED) {
+
                 app.setStatus(AppointmentStatus.CANCELLED);
                 app.setCancelReason("Bị hệ thống hủy do bác sĩ thay đổi lịch trực.");
                 appointmentRepository.save(app);
@@ -247,18 +255,18 @@ public class ScheduleServiceImpl implements ScheduleService {
                 Notification notification = new Notification();
                 notification.setUserId(app.getPatientId());
                 notification.setTitle("Lịch hẹn khám bệnh bị hủy");
-                notification.setContent("Lịch hẹn của bạn vào ca " + schedule.getStartTime().toString().substring(0, 5) + 
-                    " - " + schedule.getEndTime().toString().substring(0, 5) + " ngày " + schedule.getWorkDate() +
-                    " tại phòng " + schedule.getRoom() + " đã bị hủy bởi hệ thống do bác sĩ thay đổi lịch trực.");
+                notification.setContent("Lịch hẹn của bạn vào ca " + schedule.getStartTime().toString().substring(0, 5)
+                        +
+                        " - " + schedule.getEndTime().toString().substring(0, 5) + " ngày " + schedule.getWorkDate() +
+                        " tại phòng " + schedule.getRoom() + " đã bị hủy bởi hệ thống do bác sĩ thay đổi lịch trực.");
                 notification.setRead(false);
                 notificationRepository.save(notification);
 
                 // Gửi thông báo real-time qua SSE đến bệnh nhân
                 sseService.sendNotification(
-                    app.getPatientId(),
-                    notification.getTitle(),
-                    notification.getContent()
-                );
+                        app.getPatientId(),
+                        notification.getTitle(),
+                        notification.getContent());
             }
         }
 
@@ -280,15 +288,23 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         // Khôi phục trạng thái hoạt động (bệnh nhân có thể đăng ký bình thường)
-        // Lưu trạng thái REJECTED_CANCEL để bác sĩ biết và hiển thị trong danh sách từ chối
+        // Lưu trạng thái REJECTED_CANCEL để bác sĩ biết và hiển thị trong danh sách từ
+        // chối
         schedule.setStatus("REJECTED_CANCEL");
         if (reason != null && !reason.trim().isEmpty()) {
             schedule.setCancelReason("Từ chối hủy: " + reason);
         }
         scheduleRepository.save(schedule);
-
         log.info("Admin đã từ chối yêu cầu hủy lịch làm việc. ID: {}, Lý do từ chối: {}", id, reason);
 
         return new ResponseObject(true, "Từ chối hủy lịch thành công");
+    }
+
+    @Override
+    public List<ScheduleDTO> getTodaySchedules() {
+        return scheduleRepository.findByWorkDate(LocalDate.now()).stream()
+                .filter(s -> "ACTIVE".equals(s.getStatus()) || "REJECTED_CANCEL".equals(s.getStatus()))
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

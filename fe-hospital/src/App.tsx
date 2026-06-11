@@ -120,7 +120,6 @@ const App = () => {
               <Route path="queue" element={<DoctorQueue />} />
               <Route path="examination/:appointmentId" element={<ExaminationPage />} />
               <Route path="schedule" element={<DoctorSchedule />} />
-              <Route path="diagnosis" element={<MockPage title="Chẩn đoán & Đơn thuốc" />} />
             </Route>
 
             {/* Staff Routes */}

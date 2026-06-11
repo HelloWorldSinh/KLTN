@@ -103,6 +103,12 @@ public class ScheduleController {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @GetMapping("/today")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'STAFF')")
+    public ResponseEntity<List<ScheduleDTO>> getTodaySchedules() {
+        return ResponseEntity.ok(scheduleService.getTodaySchedules());
+    }
+
     public static class CancelRequest {
         private String reason;
 

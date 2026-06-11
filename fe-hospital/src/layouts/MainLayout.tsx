@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Calendar, Users, Activity, Package, Stethoscope, Clock, ShieldAlert, UserCircle } from 'lucide-react';
+import { Calendar, Users, Activity, Package, Clock, ShieldAlert, UserCircle } from 'lucide-react';
 import Chatbot from '../components/Chatbot';
 import { Header } from '../components/Header';
 
@@ -21,7 +21,6 @@ export const MainLayout = () => {
         return [
           { name: 'Lịch của tôi', href: '/doctor/schedule', icon: Calendar },
           { name: 'Danh sách bệnh nhân', href: '/doctor/patients', icon: Users },
-          { name: 'Chẩn đoán & Đơn thuốc', href: '/doctor/diagnosis', icon: Stethoscope },
           { name: 'Hồ sơ cá nhân', href: '/profile', icon: UserCircle },
         ];
       case 'STAFF':

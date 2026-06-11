@@ -5,6 +5,7 @@ export interface QueueItemDTO {
   queuePosition: number;
   status: string;
   displayStatus: string;
+  queueOrder?: number;
 }
 
 export interface PatientQueueResponse {
@@ -20,11 +21,13 @@ export interface PatientQueueResponse {
   startTime: string;
   endTime: string;
   queueList: QueueItemDTO[];
+  myQueueOrder?: number;
 }
 
 export interface DoctorQueueItemDTO extends QueueItemDTO {
   patientId: number;
   patientName: string;
+  absentAt?: string; // Thời gian bắt đầu vắng mặt
 }
 
 export interface DoctorQueueResponse {
@@ -45,7 +48,26 @@ export interface ScheduleSummary {
   endTime: string;
 }
 
+export interface ScheduleDTO {
+  id: number;
+  doctorId: number;
+  doctorName: string;
+  workDate: string;
+  startTime: string;
+  endTime: string;
+  slot: number;
+  room: string;
+  appointmentCount: number;
+  status: string;
+}
+
 export const queueService = {
+  // Điều dưỡng lấy danh sách schedule hôm nay
+  getTodaySchedulesForStaff: async (): Promise<ScheduleDTO[]> => {
+    const response = await api.get('/schedules/today');
+    return response.data;
+  },
+
   // Bác sĩ lấy danh sách schedule hôm nay
   getTodaySchedules: async (): Promise<ScheduleSummary[]> => {
     const response = await api.get('/queue/doctor/schedules/today');

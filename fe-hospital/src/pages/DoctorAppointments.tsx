@@ -156,6 +156,14 @@ export const DoctorAppointments = () => {
                             <span>{app.patientGender}</span>
                             <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
                             <span>{new Date().getFullYear() - new Date(app.patientDob).getFullYear()} tuổi</span>
+                            {app.queueOrder !== undefined && (
+                              <>
+                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                <span className="text-teal-650 font-bold bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200/30">
+                                  STT: {app.queueOrder}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>

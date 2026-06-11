@@ -26,5 +26,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
 
     // === QUEUE: Tìm tất cả schedule của bác sĩ trong ngày cụ thể ===
     List<Schedule> findByDoctorIdAndWorkDate(int doctorId, LocalDate workDate);
+    List<Schedule> findByWorkDate(LocalDate workDate);
     long countByStatus(String status);
 }
